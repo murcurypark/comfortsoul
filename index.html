@@ -190,11 +190,51 @@
   .vendor-add input { min-width: 0; border: 1px dashed var(--line); background: transparent; border-radius: 10px; padding: 7px 12px; }
   .vendor-add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
 
+  /* 시세 비교 */
+  .area-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: -4px 0 14px; font-size: 13px; }
+  .area-row select { border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 5px 8px; max-width: 100%; }
+  .area-row .btn { padding: 5px 12px; font-size: 12.5px; }
+  .ref { font-size: 11.5px; color: var(--ink-2); margin-top: 3px; }
+  .ref .tag { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 99px; font-weight: 500; font-size: 10.5px; }
+  .ref .tag.hi { background: var(--warn-soft); color: var(--warn); }
+  .ref .tag.lo { background: var(--accent-soft); color: var(--accent); }
+  tfoot tr.net td { border-top: 0; font-weight: 400; color: var(--ink-2); font-size: 12.5px; padding-top: 2px; }
+  tfoot tr.net td b { color: var(--ink); }
+
+  .market { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .mk { border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; min-width: 0; }
+  .mk.wide { grid-column: span 2; }
+  .mk h3 { margin: 0 0 10px; font: 700 15px var(--body); }
+  .mk h3 small { font-weight: 400; color: var(--ink-2); font-size: 11.5px; margin-left: 6px; }
+  .kv { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--surface-2); font-size: 13px; }
+  .kv:first-of-type { border-top: 0; }
+  .kv span { color: var(--ink-2); min-width: 0; }
+  .kv b { font-weight: 500; white-space: nowrap; }
+  .chart { display: flex; align-items: flex-end; gap: 3px; height: 120px; padding-top: 18px; position: relative; }
+  .chart i { flex: 1; background: var(--surface-2); border-radius: 4px 4px 0 0; position: relative; min-width: 0; }
+  .chart i.on { background: var(--accent); }
+  .chart i.on::after { content: attr(data-v); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); font: 700 11px var(--body); color: var(--accent); white-space: nowrap; margin-bottom: 3px; }
+  .chart-x { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--ink-2); margin-top: 4px; }
+  .mk .note { font-size: 11.5px; color: var(--ink-2); margin: 8px 0 0; line-height: 1.55; }
+  .case { padding: 8px 0; border-top: 1px solid var(--surface-2); font-size: 12.5px; }
+  .case:first-of-type { border-top: 0; }
+  .case b { font-weight: 700; color: var(--bad); }
+  .case a, .srcs a { color: var(--accent); }
+  .case p { margin: 2px 0 0; color: var(--ink-2); font-size: 11.5px; overflow-wrap: anywhere; }
+  .cmp { width: 100%; font-size: 12.5px; }
+  .cmp th { padding: 0 4px 6px; }
+  .cmp td { padding: 5px 4px; }
+  .srcs { margin: 0; padding-left: 18px; font-size: 12px; color: var(--ink-2); columns: 2; column-gap: 24px; }
+  .srcs a { color: var(--ink-2); }
+  .srcs a:hover { color: var(--accent); }
+  .mk-foot { margin-top: 14px; font-size: 11.5px; color: var(--ink-2); }
+
   footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
   footer button { border: 0; background: transparent; color: var(--ink-2); text-decoration: underline; padding: 0; font-size: 12px; }
 
   @media (max-width: 900px) {
     .cols { grid-template-columns: minmax(0, 1fr); }
+    .market { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .stats { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 600px) {
@@ -208,6 +248,9 @@
     .card { padding: 18px 16px; }
     .vendor-add { grid-template-columns: 1fr 1fr; }
     .vendor-add .btn { grid-column: 1 / -1; }
+    .market { grid-template-columns: minmax(0, 1fr); }
+    .mk.wide { grid-column: auto; }
+    .srcs { columns: 1; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -263,10 +306,15 @@
       <section class="card">
         <h2>예산 <small>단위: 만원</small></h2>
         <p class="sub">항목별로 계획한 금액과 쓴 금액을 적어 주세요. 신혼집 보증금은 포함하지 않았습니다.</p>
+        <div class="area-row">
+          <label for="area">시세 기준 지역</label>
+          <select id="area"></select>
+          <button class="btn" type="button" id="fillMarket" title="중간값이 있는 항목의 예산을 이 지역 시세로 바꿉니다">시세로 채우기</button>
+        </div>
         <div class="table-scroll"><table>
           <thead><tr><th>항목</th><th class="r">예산</th><th class="r">지출</th><th></th></tr></thead>
           <tbody id="budgetRows"></tbody>
-          <tfoot><tr id="budgetTotal"></tr></tfoot>
+          <tfoot><tr id="budgetTotal"></tr><tr class="net" id="budgetNet"></tr></tfoot>
         </table></div>
         <form class="add" id="budgetAdd" style="margin-top:14px">
           <select id="budgetGroup" aria-label="예산 묶음"></select>
@@ -284,7 +332,7 @@
           <label for="gBe" id="lblB">두 번째</label><input id="gBe" type="number" min="0" inputmode="numeric"><input id="gBc" type="number" min="0" inputmode="numeric" aria-label="두 번째 사람 쪽 확정">
         </div>
         <div class="guest-sum" id="guestSum"></div>
-        <div class="field-inline"><label for="unitCost">1인 식대</label><input id="unitCost" type="number" min="0" step="0.5" inputmode="decimal"><span class="unit">만원</span></div>
+        <div class="field-inline"><label for="unitCost">1인 식대</label><input id="unitCost" type="number" min="0" step="0.5" inputmode="decimal"><span class="unit">만원</span><span class="unit" id="unitRef"></span></div>
       </section>
 
       <section class="card">
@@ -300,12 +348,20 @@
     </div>
   </div>
 
+  <section class="card">
+    <h2>시세 참고 <small id="mkCollected"></small></h2>
+    <p class="sub">한국소비자원 참가격 계약 통계, 결혼정보회사 설문, 은행 축의금 데이터, 블로그·커뮤니티 후기를 모은 자료입니다. 지역을 바꾸면 함께 바뀝니다.</p>
+    <div class="market" id="market"></div>
+    <div class="mk-foot"><b>출처</b><ol class="srcs" id="mkSources"></ol></div>
+  </section>
+
   <footer>
     <span>입력한 내용은 이 브라우저에만 저장됩니다.</span>
     <button type="button" id="resetAll">처음 상태(예시)로 되돌리기</button>
   </footer>
 </div>
 
+<script id="market-data" type="application/json">{"areas":{"nation":{"label":"전국 평균","hall":350.0,"guarantee":200,"perGuest":6.0,"sdeme":298.0,"dress":170.0,"studio":139.0,"gift":11.7},"seoul":{"label":"서울","hall":630.0,"guarantee":200,"perGuest":8.0,"sdeme":350.0,"dress":180.0,"studio":150.0,"gift":13.4},"gyeongin":{"label":"경기·인천","hall":300.0,"guarantee":200,"perGuest":6.2,"sdeme":220.0,"dress":137.0,"studio":120.0,"gift":11.9},"metro":{"label":"광역시 (부산·대구·광주·대전·울산)","hall":250.0,"guarantee":150,"perGuest":5.3,"sdeme":280.0,"dress":180.0,"studio":140.0,"gift":12.6},"other":{"label":"그 외 지역","hall":300.0,"guarantee":200,"perGuest":5.0,"sdeme":300.0,"dress":170.0,"studio":115.0,"gift":11.7}},"optional":{"생화꽃장식":{"nation":256.0,"seoul":500.0,"gyeongin":193.0,"metro":150.0,"other":125.0},"축가/축하공연":{"nation":25.0,"seoul":30.0,"gyeongin":25.0,"metro":24.0,"other":25.0},"본식 사회자":{"nation":30.0,"seoul":33.0,"gyeongin":26.0,"metro":30.0,"other":30.0},"본식 도우미":{"nation":30.0,"seoul":30.0,"gyeongin":30.0,"metro":35.0,"other":25.0},"주례비":{"nation":16.0,"seoul":20.0,"gyeongin":17.0,"metro":15.0,"other":16.0},"폐백 음식":{"nation":30.0,"seoul":36.0,"gyeongin":34.0,"metro":17.0,"other":28.0},"폐백 수모비":{"nation":10.0,"seoul":15.0,"gyeongin":15.0,"metro":10.0,"other":10.0},"혼주 헤어/메이크업":{"nation":15.0,"seoul":17.0,"gyeongin":18.0,"metro":14.0,"other":14.0},"부케":{"nation":25.0,"seoul":29.0,"gyeongin":25.0,"metro":19.0,"other":24.0},"본식 촬영 비용":{"nation":76.0,"seoul":85.0,"gyeongin":70.0,"metro":66.0,"other":65.0},"본식 원판 구매":{"nation":50.0,"seoul":50.0,"gyeongin":51.0,"metro":50.0,"other":49.0},"플라워 샤워":{"nation":14.0,"seoul":22.0,"gyeongin":12.0,"metro":10.0,"other":10.0},"축주비":{"nation":40.0,"seoul":43.0,"gyeongin":40.0,"metro":30.0,"other":30.0},"포토테이블":{"nation":37.0,"seoul":37.0,"gyeongin":23.0,"metro":37.0,"other":37.0},"한복대여":{"nation":28.0,"seoul":33.0,"gyeongin":25.0,"metro":30.0,"other":27.0},"웨딩케이크":{"nation":38.0,"seoul":44.0,"gyeongin":20.0,"metro":30.0,"other":20.0},"본식드레스도우미":{"nation":15.0,"seoul":34.0,"gyeongin":16.0,"metro":15.0,"other":15.0},"드레스 헬퍼(촬영)":{"nation":25.0,"seoul":25.0,"gyeongin":25.0,"metro":23.0,"other":25.0},"드레스 헬퍼(본식)":{"nation":25.0,"seoul":25.0,"gyeongin":23.0,"metro":22.0,"other":25.0},"드레스 기본 피팅비":{"nation":6.0,"seoul":6.0,"gyeongin":6.0,"metro":6.0,"other":6.0},"드레스 추가 피팅비":{"nation":6.0,"seoul":6.0,"gyeongin":6.0,"metro":4.0,"other":6.0},"드레스 재가봉비":{"nation":10.0,"seoul":10.0,"gyeongin":6.0,"metro":11.0,"other":11.0},"가봉스냅":{"nation":73.0,"seoul":75.0,"gyeongin":64.0,"metro":66.0,"other":71.0},"드레스 지정비":{"nation":88.0,"seoul":83.0,"gyeongin":65.0,"metro":165.0,"other":94.0},"드레스 디자인 추가":{"nation":115.0,"seoul":88.0,"gyeongin":75.0,"metro":150.0,"other":83.0},"드레스 2부":{"nation":44.0,"seoul":50.0,"gyeongin":18.0,"metro":33.0,"other":39.0},"드레스 퍼스트웨어":{"nation":97.0,"seoul":110.0,"gyeongin":50.0,"metro":55.0,"other":139.0},"야외 예식":{"nation":15.0,"seoul":17.0,"gyeongin":25.0,"metro":15.0,"other":13.0},"턱시도 대여":{"nation":20.0,"seoul":23.0,"gyeongin":15.0,"metro":18.0,"other":15.0},"액세서리 대여":{"nation":23.0,"seoul":0.0,"gyeongin":25.0,"metro":16.0,"other":20.0}},"monthly":[{"m":"2026-04","hall":1725.0,"n":5507,"sdeme":289.0},{"m":"2026-05","hall":1740.0,"n":7448,"sdeme":289.0},{"m":"2026-06","hall":1641.0,"n":7100,"sdeme":290.0},{"m":"2026-07","hall":1400.0,"n":3468,"sdeme":290.0},{"m":"2026-08","hall":1300.0,"n":3006,"sdeme":290.0},{"m":"2026-09","hall":1600.0,"n":4384,"sdeme":292.0},{"m":"2026-10","hall":1520.0,"n":6431,"sdeme":294.0},{"m":"2026-11","hall":1500.0,"n":5710,"sdeme":300.0},{"m":"2026-12","hall":1500.0,"n":4939,"sdeme":300.0},{"m":"2027-01","hall":1400.0,"n":3179,"sdeme":300.0},{"m":"2027-02","hall":1400.0,"n":2896,"sdeme":300.0},{"m":"2027-03","hall":1580.0,"n":3933,"sdeme":300.0},{"m":"2027-04","hall":1620.0,"n":3895,"sdeme":300.0},{"m":"2027-05","hall":1575.0,"n":3372,"sdeme":300.0},{"m":"2027-06","hall":1550.0,"n":2989,"sdeme":300.0},{"m":"2027-07","hall":1418.0,"n":2030,"sdeme":300.0},{"m":"2027-08","hall":1400.0,"n":1650,"sdeme":300.0},{"m":"2027-09","hall":1575.0,"n":1922,"sdeme":300.0},{"m":"2027-10","hall":1550.0,"n":1436,"sdeme":300.0},{"m":"2027-11","hall":1650.0,"n":1092,"sdeme":300.0},{"m":"2027-12","hall":1650.0,"n":903,"sdeme":300.0}],"surveys":{"duo":{"label":"듀오 2026 (신혼부부 1,000명)","hall":1460.0,"sdeme":471.0,"gifts":588.0,"yedan":763.0,"ibaji":155.0,"honsu":1445.0,"honeymoon":1030.0,"total":5912.0,"small":895.0},"gayeon":{"label":"가연 2024 (기혼 1,000명)","hall":990.0,"sdeme":479.0,"gifts":530.0,"yedan":566.0,"honsu":2615.0,"total":6298.0}},"meal":{"코스":11.9,"뷔페":6.2,"한상차림":5.5},"season":{"peak":1580.0,"off":1418.0},"cost":{"대관료":{"lo":100.0,"hi":900.0,"basis":"중간값 350, 상위25% 600, 상위10% 900"},"기본장식비":{"lo":0.0,"hi":48.0,"basis":"평균 77"},"총 식대":{"lo":975.0,"hi":1625.0,"basis":"중간값 1,180"},"1인당 식대":{"lo":5.0,"hi":8.0,"basis":"서울 8.0 / 경인 6.2 / 광역 5.3 / 이외 5.0"},"최소보증인원":{"lo":150.0,"hi":200.0,"basis":"4대광역시 150, 그 외 200"},"스튜디오":{"lo":115.0,"hi":150.0,"basis":"중간값 139"},"드레스":{"lo":137.0,"hi":180.0,"basis":"중간값 170"},"메이크업":{"lo":null,"hi":null,"basis":"등급별 상이"},"스드메 패키지":{"lo":220.0,"hi":350.0,"basis":"중간값 298, 서울 350, 경인 220"},"드메 패키지":{"lo":137.0,"hi":180.0,"basis":"중간값 170"},"결혼반지":{"lo":100.0,"hi":400.0,"basis":"청담 다이아 1개 기준 300선 언급"},"예물 세트":{"lo":300.0,"hi":800.0,"basis":"평균 588 (듀오)"},"예단":{"lo":500.0,"hi":1500.0,"basis":"평균 763 (듀오)"},"예복":{"lo":80.0,"hi":300.0,"basis":"80~100만 언급"},"턱시도 대여":{"lo":15.0,"hi":23.0,"basis":"중간값 20"},"본식 스냅":{"lo":45.0,"hi":120.0,"basis":"45~120만 분포"},"본식 영상":{"lo":27.0,"hi":76.0,"basis":"본식 촬영 비용 중간값 76"},"가봉스냅":{"lo":64.0,"hi":75.0,"basis":"중간값 73"},"혼주 한복":{"lo":27.0,"hi":33.0,"basis":"한복대여 중간값 28~33"},"혼주 메이크업":{"lo":14.0,"hi":18.0,"basis":"중간값 15~18"},"종이 청첩장":{"lo":1.3,"hi":30.0,"basis":"1.3만(10장)~30만(224장)"},"모바일 청첩장":{"lo":0.0,"hi":1.0,"basis":"7,600원 사례"},"본식 사회자":{"lo":26.0,"hi":33.0,"basis":"중간값 30"},"주례비":{"lo":15.0,"hi":20.0,"basis":"중간값 16"},"부케":{"lo":19.0,"hi":29.0,"basis":"중간값 25"},"포토테이블":{"lo":23.0,"hi":37.0,"basis":"중간값 37"},"축주비":{"lo":30.0,"hi":43.0,"basis":"중간값 40"},"답례품":{"lo":5.0,"hi":10.0,"basis":"스몰웨딩에선 생략 가능"},"신혼여행":{"lo":600.0,"hi":1200.0,"basis":"평균 1,030 (듀오)"},"가전·가구":{"lo":1445.0,"hi":2600.0,"basis":"평균 1,445 (듀오), 2,615 (가연)"}},"extra":[{"cat":"스드메","contract":140.0,"final":200.0,"diff":60.0,"pct":42.9,"note":"박람회 견적 199만 + 예상추가금 300만 예상 → 실제 200만에 마무리. 드레스 추가금 섹션(1~20만)에서 선택. 본식 지방이라 헬퍼비+지방메이크업 추가","src":"네이버 블로그 100만원대 스드메 후기","url":"https://m.blog.naver.com/dbals0088/223802818768"},{"cat":"스드메","contract":144.0,"final":217.0,"diff":73.0,"pct":50.7,"note":"계약서에 빠진 드레스 이모 수고비는 구두로만 설명. '스드메는 100만 원으로' 요구 후 협상한 사례","src":"브런치 144만원짜리 스드메 계약서","url":"https://brunch.co.kr/@sciencetravel/158"},{"cat":"스드메","contract":82.0,"final":280.0,"diff":198.0,"pct":241.5,"note":"드레스 추가 75만은 견적서에도 없었고 구두 설명. 헬퍼비는 현금 정산이라 계약서에서 누락. '제대로 정산하면 200만원보다 훨씬 많다'","src":"머니투데이 스드메 추가금 실태","url":"https://www.mt.co.kr/society/2025/04/19/2025041416235079063"}],"support":[{"org":"구미시","metric":"소규모 예식 지원금","value":300.0,"note":"상한"},{"org":"구미시","metric":"혼인신고 청년 구미사랑상품권","value":100.0,"note":""},{"org":"서울시","metric":"공공 웨딩홀 대관료","value":0.0,"note":"서울 거주자·생활권자 무료"},{"org":"서울시","metric":"공공 웨딩홀 시설(의자·테이블) 지원금","value":100.0,"note":"상한"}],"scenarios":[{"name":"강남 일반 200명","guests":200,"total":3322.0,"notes":"식대1600+대관758+스드메387+장식226+예물의상혼주577"},{"name":"강남 일반 200명 (축의금 60% 회수)","guests":200,"total":1918.0,"notes":"지출 3,322만 - 축의금 1,404만"},{"name":"경기 일반 200명","guests":200,"total":2305.0,"notes":"식대1240+대관412+스드메256+선택443"},{"name":"경기 일반 200명 (축의금 60% 회수)","guests":200,"total":901.0,"notes":"지출 2,305만 - 축의금 1,404만"},{"name":"지방 일반 200명","guests":200,"total":1965.0,"notes":"식대1000+대관300+스드메284+선택381"},{"name":"지방 일반 200명 (축의금 60% 회수)","guests":200,"total":561.0,"notes":"지출 1,965만 - 축의금 1,404만"},{"name":"서울 스몰웨딩 50명","guests":50,"total":1476.0,"notes":"식대400+대관300+스드메300+선택476"},{"name":"서울 스몰웨딩 50명 (축의금 80% 회수)","guests":50,"total":1008.0,"notes":"지출 1,476만 - 축의금 468만"},{"name":"서울 스몰웨딩 30명","guests":30,"total":976.0,"notes":"식대240+대관250+스드메200+선택286"},{"name":"서울 스몰웨딩 30명 (축의금 85% 회수)","guests":30,"total":678.0,"notes":"지출 976만 - 축의금 298만"},{"name":"미니웨딩 7명 실제","guests":7,"total":183.6,"notes":"실제 후기: 예식126+발렛3+청첩장1.3+드레스9.8+액세서리1.6+메이크업24+스튜디오18"},{"name":"가족식 12명 실제","guests":12,"total":541.7,"notes":"실제 후기: 식대285.5+본식115+스드메62.6+혼주75.6+청첩장3"}],"sources":[{"name":"한국소비자원 참가격 지역별","url":"https://www.price.go.kr/tprice/portal/wedding/areaStatistic.do"},{"name":"한국소비자원 시기별","url":"https://www.price.go.kr/tprice/portal/wedding/areaStatisticDetailByPeriod.do"},{"name":"한국소비자원 예식장 대관료 분포","url":"https://www.price.go.kr/tprice/portal/wedding/areaStatisticDetailWH.do"},{"name":"NH농협은행 축의금 트렌드 보고서","url":"https://www.yna.co.kr/view/AKR20260513161300002"},{"name":"듀오 2026 결혼비용 실태 보고서","url":"https://www.businesskorea.co.kr/news/articleView.html?idxno=264825"},{"name":"가연 결혼비용 조사","url":"https://www.fnnews.com/news/202402271445429363"},{"name":"한국소비자원 스드메 품목별 가격","url":"https://www.price.go.kr/tprice/portal/wedding/areaStatisticDetailSDM.do"},{"name":"머니투데이 스드메 추가금 실태","url":"https://www.mt.co.kr/society/2025/04/19/2025041416235079063"}],"collected":"2026-10-24"}</script>
 <script>
 (() => {
   const KEY = "wedding-dashboard-v4";
@@ -318,6 +374,8 @@
     { id: "p6", label: "예식 후 2주 안", due: -14 },
   ];
   const GROUPS = ["예식", "스드메·꾸밈", "예물·예단", "신혼 준비", "기타"];
+  let M = null;
+  try { M = JSON.parse(document.getElementById("market-data").textContent); } catch (e) { M = null; }
   const STATUS = { todo: "상담 전", talking: "상담 중", contract: "계약 완료" };
   const uid = () => Math.random().toString(36).slice(2, 9);
 
@@ -372,6 +430,7 @@
         item("기타", "상견례 식사", 30, 30), item("기타", "답례품·감사 선물", 30, 0), item("기타", "예비비 (약 5%)", 150, 0),
       ],
       guests: { ae: 110, ac: 60, be: 90, bc: 48, unit: 6 },
+      area: "nation",
       vendors: [
         { id: uid(), name: "OO 웨딩홀", cat: "예식장", st: "contract" },
         { id: uid(), name: "AMORIS Wedding Jewelry", cat: "웨딩링", st: "talking" },
@@ -472,12 +531,81 @@
     }).join("");
   }
 
+  // ---- 시세 (market-data) ----
+  const AREA = () => (M && M.areas[S.area] ? S.area : "nation");
+  const opt = (name) => (M && M.optional[name] ? M.optional[name][AREA()] : null);
+  const guestsFor = () => { const g = S.guests; return Math.max(g.ae + g.be, 0); };
+  // 항목 이름으로 시세 종류를 찾는다 (직접 추가한 항목도 이름이 맞으면 비교됨)
+  const REF_RULES = [
+    [/여행 준비|환전|보험/, null],
+    [/스드메 추가금|헬퍼|피팅/, "sdemeExtra"],
+    [/스드메/, "sdeme"],
+    [/대관|식대/, "hall"],
+    [/옵션|생화|꽃장식/, "decor"],
+    [/스냅|본식 촬영|영상/, "snap"],
+    [/부케/, "bouquet"],
+    [/사회|축가|주례/, "mc"],
+    [/혼주.*(메이크업|헤어)/, "parentsMakeup"],
+    [/한복/, "hanbok"],
+    [/정장|예복|턱시도/, "suit"],
+    [/웨딩링|반지/, "ring"],
+    [/예단|이바지/, "yedan"],
+    [/예물/, "gifts"],
+    [/신혼여행/, "honeymoon"],
+    [/혼수|가전|가구/, "honsu"],
+  ];
+  const refKey = (name) => { for (const [re, k] of REF_RULES) if (re.test(name)) return k; return null; };
+  function refFor(name) {
+    if (!M) return null;
+    const k = refKey(name), A = M.areas[AREA()], d = M.surveys.duo, gy = M.surveys.gayeon;
+    const sum = (...xs) => xs.reduce((a, b) => a + (b || 0), 0);
+    switch (k) {
+      case "hall": {
+        const n = Math.max(guestsFor(), A.guarantee);
+        return { mid: Math.round(A.hall + A.perGuest * n), note: `대관 ${man(A.hall)} + 식대 ${A.perGuest}만×${n}명` };
+      }
+      case "decor": return { mid: opt("생화꽃장식"), note: "생화 꽃장식 중간값" };
+      case "snap": return { mid: opt("본식 촬영 비용"), note: "본식 촬영 중간값" };
+      case "bouquet": return { mid: opt("부케"), note: "부케 중간값" };
+      case "mc": return { mid: sum(opt("본식 사회자"), opt("축가/축하공연")), note: "사회자 + 축가 중간값" };
+      case "parentsMakeup": return { mid: opt("혼주 헤어/메이크업") * 2, note: "양가 혼주 2명 기준" };
+      case "sdeme": return { mid: A.sdeme, note: `드레스 ${A.dress} · 스튜디오 ${A.studio}` };
+      case "sdemeExtra": return { mid: sum(opt("드레스 헬퍼(촬영)"), opt("드레스 헬퍼(본식)"), opt("드레스 기본 피팅비")), note: "헬퍼비 2회 + 피팅비" };
+      case "hanbok": return { mid: opt("한복대여") * 2, note: "한복 대여 2벌 기준" };
+      case "suit": return { mid: opt("턱시도 대여"), note: "턱시도 대여 기준, 맞춤 예복은 80~300" };
+      case "ring": { const c = M.cost["결혼반지"]; return { lo: c.lo, hi: c.hi, note: "14K~18K, 다이아 여부에 따라" }; }
+      case "gifts": { const c = M.cost["예물 세트"]; return { lo: c.lo, hi: c.hi, note: `설문 평균 ${man(gy.gifts)}~${man(d.gifts)}` }; }
+      case "yedan": { const c = M.cost["예단"]; return { lo: c.lo, hi: c.hi, note: `설문 평균 예단 ${man(gy.yedan)}~${man(d.yedan)}, 이바지 ${man(d.ibaji)}` }; }
+      case "honeymoon": { const c = M.cost["신혼여행"]; return { lo: c.lo, hi: c.hi, note: `설문 평균 ${man(d.honeymoon)}` }; }
+      case "honsu": { const c = M.cost["가전·가구"]; return { lo: c.lo, hi: c.hi, note: `설문 평균 ${man(d.honsu)}~${man(gy.honsu)}` }; }
+      default: return null;
+    }
+  }
+  function refHtml(b) {
+    const r = refFor(b.name);
+    if (!r || (r.mid == null && r.lo == null)) return "";
+    const val = r.mid != null ? `${man(r.mid)}만` : `${man(r.lo)}~${man(r.hi)}만`;
+    let tag = "";
+    if (b.plan > 0) {
+      if ((r.mid != null && b.plan > r.mid * 1.3) || (r.hi != null && b.plan > r.hi)) tag = '<span class="tag hi">시세보다 높음</span>';
+      else if ((r.mid != null && b.plan < r.mid * 0.6) || (r.lo != null && b.plan < r.lo)) tag = '<span class="tag lo">시세보다 낮음</span>';
+    }
+    return `<div class="ref" title="${esc(r.note)}">시세 ${val}${tag}</div>`;
+  }
+  // 축의금: 하객 1인이 아니라 봉투 단위라서 DB 시나리오와 같이 60%만 회수된다고 본다
+  const GIFT_RATE = 0.6;
+  function giftEstimate() {
+    if (!M) return 0;
+    const g = S.guests, n = Math.max(g.ae + g.be, g.ac + g.bc);
+    return Math.round(n * M.areas[AREA()].gift * GIFT_RATE);
+  }
+
   function renderBudget() {
     const sum = (arr, k) => arr.reduce((x, y) => x + y[k], 0);
     const row = (b) => {
       const over = b.spent > b.plan;
       return `<tr>
-        <td><div class="nm">${esc(b.name)}</div><div class="bar"><i class="${over ? "bad" : ""}" style="width:${pct(b.spent, b.plan || b.spent)}%"></i></div>${over ? `<div class="over num">${man(b.spent - b.plan)}만 초과</div>` : ""}</td>
+        <td><div class="nm">${esc(b.name)}</div>${refHtml(b)}<div class="bar"><i class="${over ? "bad" : ""}" style="width:${pct(b.spent, b.plan || b.spent)}%"></i></div>${over ? `<div class="over num">${man(b.spent - b.plan)}만 초과</div>` : ""}</td>
         <td class="r"><input type="number" min="0" inputmode="decimal" value="${b.plan || ""}" data-bplan="${b.id}" aria-label="${esc(b.name)} 예산"></td>
         <td class="r"><input type="number" min="0" inputmode="decimal" value="${b.spent || ""}" data-bspent="${b.id}" aria-label="${esc(b.name)} 지출"></td>
         <td class="r"><button class="x" type="button" data-delbudget="${b.id}" aria-label="${esc(b.name)} 삭제">×</button></td></tr>`;
@@ -489,6 +617,10 @@
     }).join("");
     $("budgetRows").innerHTML = html || `<tr><td colspan="4" class="empty">예산 항목을 추가해 주세요.</td></tr>`;
     $("budgetTotal").innerHTML = `<td>합계</td><td class="r num">${man(sum(S.budget, "plan"))}</td><td class="r num">${man(sum(S.budget, "spent"))}</td><td></td>`;
+    const gift = giftEstimate();
+    $("budgetNet").innerHTML = gift
+      ? `<td colspan="4">예상 축의금 ${man(gift)}만을 빼면 실부담 약 <b class="num">${man(Math.max(0, sum(S.budget, "plan") - gift))}만원</b></td>`
+      : "";
   }
 
   function renderGuests() {
@@ -496,9 +628,13 @@
     $("gAe").value = g.ae || ""; $("gAc").value = g.ac || ""; $("gBe").value = g.be || ""; $("gBc").value = g.bc || ""; $("unitCost").value = g.unit || "";
     const exp = g.ae + g.be, conf = g.ac + g.bc;
     const cost = (conf || exp) * g.unit;
+    const gift = giftEstimate();
+    const A = M ? M.areas[AREA()] : null;
     $("guestSum").innerHTML = `
       <div><small>확정 / 예상</small><b class="num">${conf} / ${exp}명</b></div>
-      <div><small>예상 식대 (${conf ? "확정" : "예상"} 인원 기준)</small><b class="num">${man(cost)}만원</b></div>`;
+      <div><small>예상 식대 (${conf ? "확정" : "예상"} 인원 기준)</small><b class="num">${man(cost)}만원</b></div>
+      ${A ? `<div style="grid-column:1/-1"><small>예상 축의금 (평균 ${A.gift}만원 × ${Math.max(exp, conf)}명 × ${GIFT_RATE * 100}%)</small><b class="num">${man(gift)}만원</b><small>봉투는 하객 1인이 아니라 가족·일행 단위로 내는 경우가 많아 60%로 계산했습니다.</small></div>` : ""}`;
+    $("unitRef").textContent = A ? `· ${A.label} 중간값 ${A.perGuest}만원` : "";
   }
 
   function renderVendors() {
@@ -510,8 +646,70 @@
       : `<div class="empty">상담한 업체를 추가해 보세요.</div>`;
   }
 
+  function renderMarket() {
+    if (!M) { $("market").innerHTML = '<div class="empty">시세 데이터가 없습니다. tools/build_market.py 로 넣어 주세요.</div>'; return; }
+    const A = M.areas[AREA()], k = AREA();
+    $("mkCollected").textContent = `${M.collected} 수집`;
+    // 1) 지역 요약
+    const region = `<div class="mk"><h3>${A.label}<small>참가격 중간값</small></h3>
+      <div class="kv"><span>예식장 대관료</span><b class="num">${man(A.hall)}만원</b></div>
+      <div class="kv"><span>1인 식대</span><b class="num">${A.perGuest}만원</b></div>
+      <div class="kv"><span>최소 보증인원</span><b class="num">${A.guarantee}명</b></div>
+      <div class="kv"><span>스드메 패키지</span><b class="num">${man(A.sdeme)}만원</b></div>
+      <div class="kv"><span>드레스 / 스튜디오</span><b class="num">${A.dress} / ${A.studio}만원</b></div>
+      <div class="kv"><span>평균 축의금</span><b class="num">${A.gift}만원</b></div></div>`;
+    // 2) 예식 월별 예식장 총 계약금액
+    const w = parseDate(S.date), wm = w ? `${w.getFullYear()}-${String(w.getMonth() + 1).padStart(2, "0")}` : "";
+    const max = Math.max(...M.monthly.map((x) => x.hall));
+    const hit = M.monthly.find((x) => x.m === wm);
+    const low = M.monthly.reduce((a, b) => (b.hall < a.hall ? b : a));
+    const months = `<div class="mk wide"><h3>예식 월별 예식장 계약금액<small>전국 중간값 · 대관+식대 포함</small></h3>
+      <div class="chart" role="img" aria-label="예식 월별 예식장 계약금액 중간값">${M.monthly.map((x) =>
+        `<i class="${x.m === wm ? "on" : ""}" style="height:${(x.hall / max) * 100}%" data-v="${man(x.hall)}만" title="${x.m}: ${man(x.hall)}만원 (${x.n.toLocaleString()}건)"></i>`).join("")}</div>
+      <div class="chart-x"><span>${M.monthly[0].m}</span><span>${M.monthly[M.monthly.length - 1].m}</span></div>
+      <p class="note">${hit ? `예식 월(${wm}) 중간값은 <b>${man(hit.hall)}만원</b>입니다. ` : `예식 월(${wm || "미정"})은 자료 범위 밖입니다. `}
+      가장 낮은 달은 ${low.m} (${man(low.hall)}만원). 성수기 중간값 ${man(M.season.peak)}만원, 비수기 ${man(M.season.off)}만원으로 비수기가 ${man(M.season.peak - M.season.off)}만원 저렴합니다.</p></div>`;
+    // 3) 식사 형태별 식대
+    const meal = `<div class="mk"><h3>식사 형태별 1인 식대<small>전국 평균</small></h3>
+      ${Object.entries(M.meal).map(([n, v]) => `<div class="kv"><span>${n}</span><b class="num">${v}만원</b></div>`).join("")}
+      <p class="note">하객 ${guestsFor()}명이면 코스와 한상차림의 차이는 약 ${man((M.meal["코스"] - M.meal["한상차림"]) * guestsFor())}만원입니다.</p></div>`;
+    // 4) 자주 붙는 추가금
+    const extras = ["드레스 헬퍼(촬영)", "드레스 헬퍼(본식)", "드레스 기본 피팅비", "드레스 재가봉비", "드레스 지정비", "가봉스냅", "본식 원판 구매", "포토테이블", "플라워 샤워", "축주비", "웨딩케이크", "폐백 음식"];
+    const fees = `<div class="mk"><h3>자주 붙는 추가금<small>${A.label} 중간값</small></h3>
+      ${extras.filter((n) => M.optional[n]).map((n) => `<div class="kv"><span>${n}</span><b class="num">${M.optional[n][k]}만원</b></div>`).join("")}
+      <p class="note">계약 전에 견적서에 포함됐는지 하나씩 확인하세요.</p></div>`;
+    // 5) 실제 추가금 사례
+    const cases = `<div class="mk"><h3>실제 추가금 사례<small>후기</small></h3>
+      ${M.extra.map((x) => `<div class="case">${x.cat} 계약 ${man(x.contract)}만 → 최종 ${man(x.final)}만 <b>+${man(x.diff)}만 (${x.pct}%)</b>
+        <p>${esc(x.note)} · <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.src)}</a></p></div>`).join("")}</div>`;
+    // 6) 우리 계획 vs 설문 평균
+    const grp = (re) => S.budget.filter((b) => re.test(b.name)).reduce((a, b) => a + b.plan, 0);
+    const d = M.surveys.duo, gy = M.surveys.gayeon;
+    const rowsCmp = [
+      ["예식장", grp(/대관|식대/), d.hall, gy.hall], ["스드메", grp(/스드메/), d.sdeme, gy.sdeme], ["예물", grp(/예물|웨딩링|반지/), d.gifts, gy.gifts],
+      ["예단·이바지", grp(/예단|이바지/), d.yedan + d.ibaji, gy.yedan], ["혼수", grp(/혼수|가전|가구/), d.honsu, gy.honsu], ["신혼여행", grp(/신혼여행/), d.honeymoon, null],
+      ["합계 (신혼집 제외)", S.budget.reduce((a, b) => a + b.plan, 0), d.total, gy.total],
+    ];
+    const cmp = `<div class="mk wide"><h3>우리 계획과 설문 평균 비교<small>만원</small></h3>
+      <div class="table-scroll"><table class="cmp"><thead><tr><th>항목</th><th class="r">우리 계획</th><th class="r">듀오 2026</th><th class="r">가연 2024</th></tr></thead><tbody>
+      ${rowsCmp.map(([n, a, b, c]) => `<tr><td>${n}</td><td class="r num"><b>${man(a)}</b></td><td class="r num">${b == null ? "-" : man(b)}</td><td class="r num">${c == null ? "-" : man(c)}</td></tr>`).join("")}
+      </tbody></table></div>
+      <p class="note">설문은 예물·예단을 모두 한 부부까지 포함한 평균입니다. 듀오 응답자가 예상한 작은 결혼식 비용은 ${man(d.small)}만원입니다.</p></div>`;
+    // 7) 지원 제도
+    const support = `<div class="mk"><h3>지자체 지원<small>2026</small></h3>
+      ${M.support.map((x) => {
+        const cap = x.note === "상한", cond = x.note && !cap ? ` (${esc(x.note.replace(/\s*무료$/, ""))})` : "";
+        return `<div class="kv"><span>${esc(x.org)} ${esc(x.metric)}${cond}</span><b class="num">${x.value ? (cap ? "최대 " : "") + man(x.value) + "만원" : "무료"}</b></div>`;
+      }).join("")}
+      <p class="note">신청 조건과 기간은 각 지자체에 확인하세요.</p></div>`;
+    $("market").innerHTML = region + months + meal + fees + cases + cmp + support;
+    $("mkSources").innerHTML = M.sources.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)}</a></li>`).join("");
+  }
+
   function render() {
     $("exampleBar").hidden = !S.example;
+    $("area").value = AREA();
+    renderMarket();
     renderHero(); renderStats(); renderNext(); renderPhases(); renderBudget(); renderGuests(); renderVendors();
   }
   const touch = () => { save(); render(); };
@@ -570,6 +768,14 @@
     touch();
   });
   $("resetAll").addEventListener("click", () => { S = example(); touch(); });
+
+  if (M) $("area").innerHTML = Object.entries(M.areas).map(([k, a]) => `<option value="${k}">${a.label}</option>`).join("");
+  $("area").addEventListener("change", (e) => { S.area = e.target.value; touch(); });
+  $("fillMarket").addEventListener("click", () => {
+    S.budget.forEach((b) => { const r = refFor(b.name); if (r && r.mid != null) b.plan = r.mid; });
+    if (M) S.guests.unit = M.areas[AREA()].perGuest;
+    touch();
+  });
 
   $("budgetGroup").innerHTML = GROUPS.map((g) => `<option>${g}</option>`).join("");
   $("budgetGroup").value = "기타";
