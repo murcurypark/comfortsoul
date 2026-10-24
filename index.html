@@ -3,542 +3,534 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AMORIS 퍼스널 컬러 시트</title>
+<title>웨딩 준비 대시보드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+KR:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
+  /* 레이아웃: 상단 D-day 히어로 → 요약 4칸 → 좌(체크리스트) / 우(예산·하객·업체) 2단, 모바일은 1단 */
   :root {
-    --ivory: #fbf8f3;
-    --paper: #ffffff;
-    --blush: #f4e9e4;
-    --gold: #b8955a;
-    --gold-soft: #d9c39a;
-    --gold-line: #e6d6b8;
-    --ink: #3a3330;
-    --ink-soft: #7a6f69;
-    --ink-faint: #a89d96;
-
-    --spring: #f6c9a8;
-    --spring-2: #fbe3c4;
-    --summer: #c9d6ea;
-    --summer-2: #e6d4e4;
-    --autumn: #c98d5c;
-    --autumn-2: #e3b98a;
-    --winter: #5e6f9a;
-    --winter-2: #b9c3dc;
-
-    --serif-en: "Cormorant Garamond", Georgia, serif;
-    --serif-ko: "Noto Serif KR", "Nanum Myeongjo", serif;
-    --sans: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --bg: #f5f6f4;
+    --surface: #ffffff;
+    --surface-2: #eef0ed;
+    --ink: #1f2a2e;
+    --ink-2: #5d6b70;
+    --line: #dfe3e0;
+    --accent: #b84a68;
+    --accent-soft: #f6e3e8;
+    --ok: #3f7d5f;
+    --ok-soft: #e0efe7;
+    --warn: #a9701a;
+    --warn-soft: #f8ecd2;
+    --bad: #b3402f;
+    --bad-soft: #f7dfdb;
+    --display: "Gowun Batang", "Noto Serif KR", serif;
+    --body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    color-scheme: light;
   }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151a1c; --surface: #1e2527; --surface-2: #262e31; --ink: #e8eceb; --ink-2: #9aa7aa; --line: #323c3f;
+      --accent: #e0829b; --accent-soft: #3a2830; --ok: #6fbf97; --ok-soft: #213a2e;
+      --warn: #e0b25a; --warn-soft: #3b3220; --bad: #e8806e; --bad-soft: #3d2723;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151a1c; --surface: #1e2527; --surface-2: #262e31; --ink: #e8eceb; --ink-2: #9aa7aa; --line: #323c3f;
+    --accent: #e0829b; --accent-soft: #3a2830; --ok: #6fbf97; --ok-soft: #213a2e;
+    --warn: #e0b25a; --warn-soft: #3b3220; --bad: #e8806e; --bad-soft: #3d2723;
+    color-scheme: dark;
+  }
+
   * { box-sizing: border-box; }
   body {
-    margin: 0; padding: 32px 16px 48px; color: var(--ink);
-    font-family: var(--sans); font-weight: 400;
-    background:
-      radial-gradient(1200px 600px at 10% -10%, #f7ece6 0%, transparent 60%),
-      radial-gradient(900px 500px at 110% 10%, #f3eadb 0%, transparent 55%),
-      var(--ivory);
+    margin: 0; background: var(--bg); color: var(--ink); font: 400 14px/1.6 var(--body);
+    padding: 24px max(16px, env(safe-area-inset-left, 0px)) 56px max(16px, env(safe-area-inset-right, 0px));
     -webkit-font-smoothing: antialiased;
   }
+  .wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .num { font-variant-numeric: tabular-nums; }
 
-  /* ---------- toolbar ---------- */
-  .tools {
-    max-width: 880px; margin: 0 auto 16px; display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;
+  /* ---------- hero ---------- */
+  .hero {
+    display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 28px 32px;
   }
-  .tools button {
-    font: 400 13px var(--sans); letter-spacing: .04em; color: var(--ink);
-    padding: 9px 18px; border: 1px solid var(--gold-soft); background: rgba(255,255,255,.7);
-    border-radius: 999px; cursor: pointer; transition: all .2s;
+  .couple { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .couple input {
+    width: 7.5em; border: 0; border-bottom: 1px dashed var(--line); background: transparent; padding: 2px 0;
+    font: 700 26px/1.3 var(--display); color: var(--ink);
   }
-  .tools button:hover { background: var(--gold); border-color: var(--gold); color: #fff; }
-  .tools select {
-    font: 400 13px var(--sans); color: var(--ink); padding: 9px 14px; border: 1px solid var(--gold-soft);
-    background: rgba(255,255,255,.7); border-radius: 999px; cursor: pointer; max-width: 100%;
+  .couple input::placeholder { color: var(--ink-2); opacity: .55; font-weight: 400; }
+  .couple input:focus { outline: none; border-bottom-color: var(--accent); }
+  .couple .amp { font: 400 22px var(--display); color: var(--accent); }
+  .date-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; color: var(--ink-2); flex-wrap: wrap; }
+  .date-row input[type=date] {
+    border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 6px 10px; color: var(--ink);
   }
+  .dday { display: flex; align-items: center; gap: 22px; }
+  .dday .big { text-align: right; }
+  .dday .big small { display: block; font-size: 12px; color: var(--ink-2); letter-spacing: .08em; }
+  .dday .big b { display: block; font: 700 64px/1 var(--display); color: var(--accent); }
+  .dday .big span { font-size: 13px; color: var(--ink-2); }
+  .ring { position: relative; width: 96px; height: 96px; flex: none; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring .t { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; line-height: 1.2; }
+  .ring .t b { font: 700 20px var(--display); display: block; }
+  .ring .t small { font-size: 10.5px; color: var(--ink-2); }
 
-  /* ---------- sheet ---------- */
-  .sheet {
-    position: relative; max-width: 880px; margin: 0 auto; background: var(--paper);
-    padding: 56px 56px 44px; border-radius: 2px;
-    box-shadow: 0 1px 2px rgba(80,60,40,.06), 0 18px 50px -20px rgba(120,90,60,.25);
+  .example-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 10px 16px; font-size: 13px;
   }
-  .sheet::before, .sheet::after {
-    content: ""; position: absolute; pointer-events: none; border: 1px solid var(--gold-line);
+  .example-bar button {
+    border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 999px; padding: 5px 14px; font-weight: 500;
   }
-  .sheet::before { inset: 14px; }
-  .sheet::after { inset: 19px; border-color: rgba(230,214,184,.55); }
+  .example-bar button:hover { background: var(--surface); }
 
-  header { text-align: center; position: relative; }
-  .crown { width: 220px; height: 34px; color: var(--gold); display: block; margin: 0 auto 6px; }
-  .brand {
-    margin: 0; font: 500 54px/1 var(--serif-en); letter-spacing: .22em; padding-left: .22em; color: var(--ink);
-  }
-  .brand-sub {
-    margin: 10px 0 0; font: 500 14px var(--serif-en); letter-spacing: .5em; padding-left: .5em; color: var(--gold);
-  }
-  .title-ko {
-    margin: 28px 0 4px; font: 500 20px var(--serif-ko); letter-spacing: .12em;
-  }
-  .title-en {
-    margin: 0; font: italic 400 16px var(--serif-en); color: var(--ink-soft); letter-spacing: .04em;
-  }
-  .divider {
-    display: flex; align-items: center; gap: 14px; margin: 26px auto 30px; max-width: 360px; color: var(--gold-soft);
-  }
-  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: currentColor; }
-  .divider span { font-size: 10px; color: var(--gold); }
+  /* ---------- summary ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; min-width: 0; }
+  .stat .k { font-size: 12px; color: var(--ink-2); letter-spacing: .04em; }
+  .stat .v { margin-top: 4px; font: 700 26px/1.2 var(--display); }
+  .stat .v small { font: 400 13px var(--body); color: var(--ink-2); margin-left: 4px; }
+  .meter { height: 6px; border-radius: 99px; background: var(--surface-2); margin-top: 10px; overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .4s; }
+  .meter i.ok { background: var(--ok); }
+  .meter i.bad { background: var(--bad); }
 
-  /* ---------- couple info ---------- */
-  .info {
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 34px;
-  }
-  .field label {
-    display: block; font: 500 11px var(--serif-en); letter-spacing: .25em; text-transform: uppercase; color: var(--gold);
-    margin-bottom: 4px;
-  }
-  .field label span { font: 400 11px var(--sans); letter-spacing: .05em; color: var(--ink-faint); margin-left: 4px; text-transform: none; }
-  .field input {
-    width: 100%; border: 0; border-bottom: 1px solid var(--gold-line); padding: 6px 2px; background: transparent;
-    font: 400 15px var(--serif-ko); color: var(--ink);
-  }
-  .field input:focus { outline: none; border-bottom-color: var(--gold); }
+  /* ---------- layout ---------- */
+  .cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; }
+  .card > h2 { margin: 0 0 4px; font: 700 20px/1.3 var(--display); display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .card > h2 small { font: 400 12.5px var(--body); color: var(--ink-2); }
+  .card .sub { margin: 0 0 16px; font-size: 12.5px; color: var(--ink-2); }
 
-  /* ---------- person panels ---------- */
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  .panel {
-    border: 1px solid var(--gold-line); border-radius: 14px; padding: 22px 22px 20px; background: linear-gradient(180deg, #fffdfa, #fff);
-  }
-  .panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
-  .panel-head h2 { margin: 0; font: 500 26px var(--serif-en); letter-spacing: .08em; }
-  .panel-head h2 small { font: 400 13px var(--serif-ko); color: var(--ink-soft); letter-spacing: .1em; margin-left: 8px; }
-  .panel-head .ring { width: 26px; height: 26px; color: var(--gold); }
+  /* next up */
+  .next { display: flex; flex-direction: column; gap: 8px; }
+  .next-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
+  .next-item .d { flex: none; min-width: 58px; text-align: center; font: 700 13px var(--body); padding: 3px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
+  .next-item .d.late { background: var(--bad-soft); color: var(--bad); }
+  .next-item span { min-width: 0; overflow-wrap: anywhere; }
+  .empty { padding: 14px; text-align: center; color: var(--ink-2); font-size: 13px; }
 
-  .lab { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
-  .lab label {
-    display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 8px;
-    border-radius: 10px; background: var(--ivory); border: 1px solid transparent; transition: border-color .2s;
-  }
-  .lab label:focus-within { border-color: var(--gold-soft); background: #fff; }
-  .lab span { font: italic 500 15px var(--serif-en); color: var(--gold); }
-  .lab input {
-    width: 100%; border: 0; background: transparent; text-align: center; padding: 0;
-    font: 500 18px var(--serif-en); color: var(--ink); letter-spacing: .02em;
-  }
-  .lab input:focus { outline: none; }
-  .lab input::placeholder { color: #d4cbc3; }
-  .lab label.calc { background: transparent; border: 1px dashed var(--gold-line); }
+  /* checklist */
+  .phase + .phase { margin-top: 18px; }
+  .phase-h { display: flex; align-items: center; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .phase-h b { font: 700 15px var(--body); }
+  .phase-h .due { font-size: 12px; color: var(--ink-2); }
+  .phase-h .cnt { margin-left: auto; font-size: 12px; color: var(--ink-2); }
+  .badge { font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 99px; }
+  .badge.ok { background: var(--ok-soft); color: var(--ok); }
+  .badge.late { background: var(--bad-soft); color: var(--bad); }
+  .tasks { list-style: none; margin: 0; padding: 0; }
+  .task { display: flex; align-items: flex-start; gap: 10px; padding: 9px 2px; border-bottom: 1px solid var(--surface-2); }
+  .task label { flex: 1; min-width: 0; display: flex; gap: 10px; align-items: flex-start; cursor: pointer; overflow-wrap: anywhere; }
+  .task input[type=checkbox] { appearance: none; flex: none; width: 20px; height: 20px; margin: 1px 0 0; border: 1.5px solid var(--ink-2); border-radius: 6px; background: var(--surface); display: grid; place-content: center; cursor: pointer; }
+  .task input[type=checkbox]:checked { background: var(--ok); border-color: var(--ok); }
+  .task input[type=checkbox]:checked::after { content: ""; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: translateY(-1px) rotate(45deg); }
+  .task.done label span { color: var(--ink-2); text-decoration: line-through; }
+  .x { flex: none; border: 0; background: transparent; color: var(--ink-2); width: 26px; height: 26px; border-radius: 8px; font-size: 16px; line-height: 1; opacity: .55; }
+  .x:hover { opacity: 1; background: var(--surface-2); color: var(--bad); }
+  .add { display: flex; gap: 8px; margin-top: 10px; }
+  .add input { flex: 1; min-width: 0; border: 1px dashed var(--line); background: transparent; border-radius: 10px; padding: 7px 12px; }
+  .add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
+  .btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 7px 14px; font-weight: 500; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
 
-  .seasons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .season {
-    position: relative; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px;
-    border: 1px solid #efe7dc; background: #fff; cursor: pointer; text-align: left; font: inherit; color: inherit;
-    transition: all .2s;
+  /* budget */
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font: 500 11.5px var(--body); letter-spacing: .06em; color: var(--ink-2); padding: 0 6px 8px; }
+  th.r, td.r { text-align: right; }
+  td { padding: 8px 6px; border-top: 1px solid var(--surface-2); vertical-align: middle; }
+  td .nm { font-weight: 500; overflow-wrap: anywhere; }
+  td input[type=number] {
+    width: 72px; text-align: right; border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 5px 8px; font-variant-numeric: tabular-nums;
   }
-  .season:hover { border-color: var(--gold-soft); }
-  .season .dot { flex: none; width: 26px; height: 26px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.05); }
-  .season .t { display: flex; flex-direction: column; line-height: 1.25; }
-  .season .t b { font: 500 15px var(--serif-en); letter-spacing: .04em; }
-  .season .t i { font: normal 400 11px var(--sans); color: var(--ink-soft); }
-  .season[data-s="spring"] .dot { background: linear-gradient(135deg, var(--spring-2), var(--spring)); }
-  .season[data-s="summer"] .dot { background: linear-gradient(135deg, var(--summer-2), var(--summer)); }
-  .season[data-s="autumn"] .dot { background: linear-gradient(135deg, var(--autumn-2), var(--autumn)); }
-  .season[data-s="winter"] .dot { background: linear-gradient(135deg, var(--winter-2), var(--winter)); }
-  .season.suggest::after {
-    content: "추천"; position: absolute; top: -8px; right: 8px; font: 500 10px var(--sans); letter-spacing: .1em;
-    background: var(--gold); color: #fff; padding: 2px 7px; border-radius: 999px;
-  }
-  .season.on { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 6px 16px -8px rgba(184,149,90,.6); }
-  .season.on .dot { box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--gold); }
+  td input[type=number]:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .bar { height: 6px; border-radius: 99px; background: var(--surface-2); margin-top: 6px; overflow: hidden; min-width: 80px; }
+  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+  .bar i.bad { background: var(--bad); }
+  .over { font-size: 11px; color: var(--bad); }
+  tfoot td { border-top: 2px solid var(--line); font-weight: 700; }
+  .unit { font-size: 11.5px; color: var(--ink-2); }
 
-  /* result */
-  .result { margin-top: 18px; padding-top: 18px; border-top: 1px solid #f0e8dc; min-height: 168px; }
-  .result.empty { display: flex; align-items: center; justify-content: center; text-align: center; color: var(--ink-faint); font-size: 13px; line-height: 1.7; }
-  .res-season { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-  .res-season b { font: 500 24px var(--serif-ko); letter-spacing: .06em; }
-  .res-season em { font: italic 400 18px var(--serif-en); color: var(--gold); }
-  .res-mood { margin: 2px 0 14px; font-size: 13px; color: var(--ink-soft); }
+  /* guests */
+  .guest-grid { display: grid; grid-template-columns: auto 1fr 1fr; gap: 8px 12px; align-items: center; }
+  .guest-grid .h { font-size: 11.5px; color: var(--ink-2); letter-spacing: .04em; }
+  .guest-grid input, .field-inline input {
+    width: 100%; text-align: right; border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 6px 10px; font-variant-numeric: tabular-nums;
+  }
+  .guest-grid input:focus, .field-inline input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .guest-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .guest-sum div { background: var(--surface-2); border-radius: 12px; padding: 10px 14px; }
+  .guest-sum small { display: block; font-size: 11.5px; color: var(--ink-2); }
+  .guest-sum b { font: 700 19px var(--display); }
+  .field-inline { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; }
+  .field-inline input { width: 90px; }
 
-  .gauge { margin-bottom: 14px; }
-  .gauge-top { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-soft); margin-bottom: 6px; }
-  .gauge-top strong { color: var(--ink); font-weight: 500; }
-  .bar {
-    position: relative; height: 6px; border-radius: 99px;
-    background: linear-gradient(90deg, #c8cfe6 0%, #ddd3e2 35%, #efe2d6 50%, #f3d2ac 70%, #e7b37a 100%);
-  }
-  .bar i {
-    position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
-    background: #fff; border: 2px solid var(--gold); box-shadow: 0 1px 4px rgba(0,0,0,.15); transition: left .4s;
-  }
-  .bar-scale { display: flex; justify-content: space-between; font: 400 10px var(--sans); color: var(--ink-faint); margin-top: 5px; }
+  /* vendors */
+  .vendor { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--surface-2); }
+  .vendor:first-child { border-top: 0; }
+  .vendor .nm { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .vendor .nm b { font-weight: 500; }
+  .vendor .nm small { display: block; color: var(--ink-2); font-size: 12px; }
+  .vendor select { border: 1px solid transparent; border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 500; appearance: none; text-align: center; background: var(--surface-2); cursor: pointer; }
+  .vendor select[data-st="contract"] { background: var(--ok-soft); color: var(--ok); }
+  .vendor select[data-st="talking"] { background: var(--warn-soft); color: var(--warn); }
+  .vendor-add { display: grid; grid-template-columns: 1fr 90px auto; gap: 8px; margin-top: 12px; }
+  .vendor-add input { min-width: 0; border: 1px dashed var(--line); background: transparent; border-radius: 10px; padding: 7px 12px; }
+  .vendor-add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
 
-  .metals { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--ivory); border-radius: 10px; }
-  .metals .label { font: 500 10px var(--serif-en); letter-spacing: .25em; color: var(--gold); text-transform: uppercase; }
-  .metals .chips { display: flex; gap: 6px; }
-  .metals .txt { margin-left: auto; text-align: right; font-size: 12px; line-height: 1.5; }
-  .metals .txt b { display: block; font: 500 13px var(--sans); }
+  footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+  footer button { border: 0; background: transparent; color: var(--ink-2); text-decoration: underline; padding: 0; font-size: 12px; }
 
-  .chip {
-    width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
-    font: 600 8.5px var(--sans); letter-spacing: .02em; color: rgba(60,45,30,.75);
-    box-shadow: inset 0 -2px 4px rgba(0,0,0,.12), inset 0 2px 4px rgba(255,255,255,.7), 0 1px 2px rgba(0,0,0,.12);
+  @media (max-width: 900px) {
+    .cols { grid-template-columns: minmax(0, 1fr); }
+    .stats { grid-template-columns: 1fr 1fr; }
   }
-  .chip.YG { background: radial-gradient(circle at 35% 30%, #fff4cc, #e4c26e 45%, #b78f35); }
-  .chip.PG { background: radial-gradient(circle at 35% 30%, #ffe9e0, #e6b39e 45%, #b97b66); }
-  .chip.WG { background: radial-gradient(circle at 35% 30%, #ffffff, #dfe2e6 45%, #a9afb7); }
-  .chip.NW { background: radial-gradient(circle at 35% 30%, #fffdf6, #ece4d4 45%, #bdb19b); }
-
-  /* ---------- section titles ---------- */
-  .sec-title { text-align: center; margin: 46px 0 20px; }
-  .sec-title h3 { margin: 0; font: 500 22px var(--serif-en); letter-spacing: .16em; }
-  .sec-title p { margin: 4px 0 0; font: 400 13px var(--serif-ko); color: var(--ink-soft); letter-spacing: .08em; }
-
-  /* ---------- season guide ---------- */
-  .guide { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .gcard {
-    position: relative; border-radius: 14px; overflow: hidden; background: #fff; border: 1px solid #efe7dc;
-    transition: box-shadow .3s, border-color .3s;
+  @media (max-width: 600px) {
+    body { padding-top: 14px; }
+    .hero { grid-template-columns: 1fr; padding: 22px 20px; }
+    .dday { justify-content: space-between; }
+    .dday .big { text-align: left; }
+    .dday .big b { font-size: 52px; }
+    .couple input { font-size: 22px; width: 6em; }
+    .card { padding: 18px 16px; }
+    .vendor-add { grid-template-columns: 1fr 1fr; }
+    .vendor-add .btn { grid-column: 1 / -1; }
   }
-  .gcard .sw { height: 64px; position: relative; }
-  .gcard[data-s="spring"] .sw { background: linear-gradient(135deg, #fff3e2, var(--spring-2) 40%, var(--spring)); }
-  .gcard[data-s="summer"] .sw { background: linear-gradient(135deg, #f6f0f6, var(--summer-2) 40%, var(--summer)); }
-  .gcard[data-s="autumn"] .sw { background: linear-gradient(135deg, #f6e3c8, var(--autumn-2) 40%, var(--autumn)); }
-  .gcard[data-s="winter"] .sw { background: linear-gradient(135deg, #e3e7f2, var(--winter-2) 40%, var(--winter)); }
-  .gcard .sw span {
-    position: absolute; left: 14px; bottom: 8px; font: italic 500 22px var(--serif-en); color: rgba(255,255,255,.95);
-    text-shadow: 0 1px 6px rgba(0,0,0,.15);
-  }
-  .gcard[data-s="spring"] .sw span, .gcard[data-s="summer"] .sw span { color: rgba(90,70,60,.8); text-shadow: none; }
-  .gcard .body { padding: 12px 14px 14px; }
-  .gcard .tone-tag { font: 500 10px var(--sans); letter-spacing: .12em; color: var(--ink-soft); }
-  .gcard h4 { margin: 2px 0 8px; font: 500 18px var(--serif-ko); }
-  .gcard .crit { font-size: 11.5px; color: var(--ink-soft); line-height: 1.6; padding-bottom: 10px; border-bottom: 1px solid #f2ebe0; }
-  .gcard .crit b { color: var(--ink); font-weight: 500; }
-  .gcard .m { display: flex; gap: 4px; margin: 10px 0 6px; }
-  .gcard .m .chip { width: 24px; height: 24px; font-size: 7.5px; }
-  .gcard .mt { font-size: 12px; font-weight: 500; }
-  .gcard .mood { font: 400 12px var(--serif-ko); color: var(--gold); margin-top: 2px; }
-  .gcard.hit { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 12px 28px -14px rgba(184,149,90,.7); }
-  .gcard .who { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
-  .gcard .who em {
-    font: normal 500 10px var(--sans); background: rgba(255,255,255,.92); color: var(--ink); padding: 2px 7px; border-radius: 99px;
-  }
-
-  .tone-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-  .tone-notes div {
-    padding: 12px 16px; border-radius: 12px; font-size: 12.5px; line-height: 1.6; color: var(--ink-soft);
-  }
-  .tone-notes b { display: block; color: var(--ink); font: 500 14px var(--serif-ko); }
-  .tone-notes .w { background: linear-gradient(90deg, #fdf3e8, #fbf7f1); }
-  .tone-notes .c { background: linear-gradient(90deg, #eef1f8, #f7f5f9); }
-
-  /* ---------- undertone scale ---------- */
-  .under { display: grid; grid-template-columns: repeat(5, 1fr); border-radius: 14px; overflow: hidden; border: 1px solid #efe7dc; }
-  .under div { padding: 14px 12px; position: relative; transition: background .3s; }
-  .under div + div { border-left: 1px solid rgba(255,255,255,.7); }
-  .under .r { font: 500 17px var(--serif-en); letter-spacing: .02em; }
-  .under .n { font: 500 12.5px var(--sans); margin: 2px 0 4px; }
-  .under .d { font-size: 11px; color: var(--ink-soft); line-height: 1.5; }
-  .under [data-u="cool"] { background: #e6eaf5; }
-  .under [data-u="ncool"] { background: #eeeaf3; }
-  .under [data-u="neutral"] { background: #f6f0ea; }
-  .under [data-u="nwarm"] { background: #fbeadb; }
-  .under [data-u="warm"] { background: #f8e0c4; }
-  .under div.hit { box-shadow: inset 0 0 0 2px var(--gold); }
-  .under div.hit::after {
-    content: attr(data-who); position: absolute; top: 8px; right: 8px; font: 500 10px var(--sans);
-    color: #fff; background: var(--gold); padding: 1px 7px; border-radius: 99px;
-  }
-  .under-cap { text-align: center; font-size: 11.5px; color: var(--ink-faint); margin-top: 10px; letter-spacing: .03em; }
-
-  footer { text-align: center; margin-top: 44px; }
-  footer p { margin: 0; font: italic 400 17px var(--serif-en); color: var(--gold); letter-spacing: .06em; }
-  footer small { display: block; margin-top: 6px; font-size: 11px; color: var(--ink-faint); letter-spacing: .04em; }
-  footer .sign { display: flex; justify-content: flex-end; gap: 10px; align-items: flex-end; margin-top: 26px; font-size: 11px; color: var(--ink-soft); letter-spacing: .1em; }
-  footer .sign span { display: inline-block; width: 140px; border-bottom: 1px solid var(--gold-line); height: 18px; }
-
-  @media (max-width: 760px) {
-    body { padding: 12px 8px 32px; }
-    .sheet { padding: 40px 24px 32px; }
-    .sheet::before { inset: 8px; } .sheet::after { inset: 12px; }
-    .brand { font-size: 40px; }
-    .info { grid-template-columns: 1fr; gap: 14px; }
-    .pair, .tone-notes { grid-template-columns: 1fr; }
-    .guide { grid-template-columns: 1fr 1fr; }
-    .under { grid-template-columns: 1fr; }
-    .under div + div { border-left: 0; border-top: 1px solid rgba(255,255,255,.7); }
-  }
-  @media (max-width: 400px) {
-    .sheet { padding: 36px 16px 28px; }
-    .lab { gap: 5px; }
-    .lab input { font-size: 16px; }
-  }
-  @media print {
-    @page { size: A4; margin: 8mm; }
-    body { background: #fff; padding: 0; }
-    .tools { display: none; }
-    .sheet { box-shadow: none; max-width: none; padding: 36px 40px 28px; }
-    .sec-title { margin: 26px 0 12px; }
-    footer { margin-top: 24px; }
-    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-<div class="tools">
-  <select id="sample" aria-label="테스트용 예시">
-    <option value="">테스트용 예시 선택…</option>
-  </select>
-  <button type="button" id="reset">초기화</button>
-  <button type="button" onclick="window.print()">인쇄 / PDF 저장</button>
-</div>
+<div class="wrap">
 
-<main class="sheet">
-  <header>
-    <svg class="crown" viewBox="0 0 220 34" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true">
-      <path d="M8 24c18-10 40-12 62-4 10 4 18 4 24 0M212 24c-18-10-40-12-62-4-10 4-18 4-24 0" stroke-linecap="round"/>
-      <path d="M30 18c-6-6-2-12 4-10M190 18c6-6 2-12-4-10" stroke-linecap="round"/>
-      <path d="M96 27l-4-16 9 7 9-13 9 13 9-7-4 16z" fill="currentColor" fill-opacity=".12" stroke-linejoin="round"/>
-      <circle cx="92" cy="9.5" r="1.8" fill="currentColor"/><circle cx="110" cy="3.5" r="1.8" fill="currentColor"/><circle cx="128" cy="9.5" r="1.8" fill="currentColor"/>
-      <path d="M95 30h30" stroke-linecap="round"/>
-    </svg>
-    <h1 class="brand">AMORIS</h1>
-    <p class="brand-sub">WEDDING JEWELRY</p>
-    <p class="title-ko">웨딩링 퍼스널 컬러 진단</p>
-    <p class="title-en">Personal Color Consultation for Your Wedding Rings</p>
-    <div class="divider"><span>◆</span></div>
-  </header>
-
-  <section class="info">
-    <div class="field"><label>Bride <span>신부</span></label><input id="name-female" placeholder="성함"></div>
-    <div class="field"><label>Groom <span>신랑</span></label><input id="name-male" placeholder="성함"></div>
-    <div class="field"><label>Date <span>진단일</span></label><input id="date" type="date"></div>
+  <section class="hero">
+    <div>
+      <div class="couple">
+        <input id="nameA" placeholder="신랑 이름" aria-label="신랑 이름" maxlength="12">
+        <span class="amp">&amp;</span>
+        <input id="nameB" placeholder="신부 이름" aria-label="신부 이름" maxlength="12">
+      </div>
+      <div class="date-row">
+        <label for="weddingDate">예식일</label>
+        <input id="weddingDate" type="date">
+        <span id="dateLabel"></span>
+      </div>
+    </div>
+    <div class="dday">
+      <div class="big"><small>WEDDING DAY</small><b id="ddayNum" class="num">D-0</b><span id="ddaySub"></span></div>
+      <div class="ring" aria-label="체크리스트 진행률">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface-2)" stroke-width="9"/><circle id="ringArc" cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="263.9" style="transition: stroke-dashoffset .5s"/></svg>
+        <div class="t"><div><b id="ringPct" class="num">0%</b><small>준비 완료</small></div></div>
+      </div>
+    </div>
   </section>
 
-  <section class="pair">
-    <article class="panel" data-who="female">
-      <div class="panel-head">
-        <h2>Bride<small>신부 · Female</small></h2>
-        <svg class="ring" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="13" cy="16" r="7.5"/><path d="M10 6.5l3-3.5 3 3.5-3 2.5z" fill="currentColor" fill-opacity=".25" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="lab">
-        <label><span>L*</span><input inputmode="decimal" data-k="L" placeholder="00.00" aria-label="신부 L*"></label>
-        <label><span>a*</span><input inputmode="decimal" data-k="a" placeholder="00.00" aria-label="신부 a*"></label>
-        <label><span>b*</span><input inputmode="decimal" data-k="b" placeholder="00.00" aria-label="신부 b*"></label>
-        <label class="calc"><span>b*−a*</span><input data-k="ba" readonly tabindex="-1" placeholder="auto" aria-label="신부 b*-a*"></label>
-      </div>
-      <div class="seasons"></div>
-      <div class="result empty"></div>
-    </article>
-
-    <article class="panel" data-who="male">
-      <div class="panel-head">
-        <h2>Groom<small>신랑 · Male</small></h2>
-        <svg class="ring" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="13" cy="14" r="8.5"/><circle cx="13" cy="14" r="6"/></svg>
-      </div>
-      <div class="lab">
-        <label><span>L*</span><input inputmode="decimal" data-k="L" placeholder="00.00" aria-label="신랑 L*"></label>
-        <label><span>a*</span><input inputmode="decimal" data-k="a" placeholder="00.00" aria-label="신랑 a*"></label>
-        <label><span>b*</span><input inputmode="decimal" data-k="b" placeholder="00.00" aria-label="신랑 b*"></label>
-        <label class="calc"><span>b*−a*</span><input data-k="ba" readonly tabindex="-1" placeholder="auto" aria-label="신랑 b*-a*"></label>
-      </div>
-      <div class="seasons"></div>
-      <div class="result empty"></div>
-    </article>
-  </section>
-
-  <div class="sec-title">
-    <h3>SEASON &amp; METAL GUIDE</h3>
-    <p>계절별 어울리는 웨딩링 컬러</p>
-  </div>
-  <section class="guide" id="guide"></section>
-  <div class="tone-notes">
-    <div class="w"><b>봄웜 · 가을웜 — Warm Tone</b>b*−a* 5 이상 · 차분하고 혈색 있어 보임</div>
-    <div class="c"><b>여름쿨 · 겨울쿨 — Cool Tone</b>b*−a* 5 미만 · 화사하고 생기 있어 보임</div>
+  <div class="example-bar" id="exampleBar" hidden>
+    <span>지금 보이는 숫자와 업체는 예시입니다. 예식일을 바꾸면 체크리스트 기한도 함께 바뀝니다.</span>
+    <button type="button" id="clearExample">예시 지우고 시작</button>
   </div>
 
-  <div class="sec-title">
-    <h3>UNDERTONE</h3>
-    <p>언더톤 ▸ b* − a*</p>
+  <section class="stats" id="stats"></section>
+
+  <div class="cols">
+    <div class="col">
+      <section class="card">
+        <h2>지금 챙길 일 <small>기한이 가까운 순서</small></h2>
+        <p class="sub">체크리스트에서 아직 끝내지 않은 항목입니다.</p>
+        <div class="next" id="next"></div>
+      </section>
+      <section class="card">
+        <h2>준비 체크리스트 <small id="checkCount"></small></h2>
+        <p class="sub">기한은 예식일에서 거꾸로 계산됩니다. 항목은 직접 추가하거나 지울 수 있습니다.</p>
+        <div id="phases"></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card">
+        <h2>예산 <small>단위: 만원</small></h2>
+        <p class="sub">항목별로 계획한 금액과 지금까지 쓴 금액을 적어 주세요.</p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>항목</th><th class="r">예산</th><th class="r">지출</th><th></th></tr></thead>
+          <tbody id="budgetRows"></tbody>
+          <tfoot><tr id="budgetTotal"></tr></tfoot>
+        </table></div>
+        <form class="add" id="budgetAdd" style="margin-top:14px">
+          <input id="budgetName" placeholder="항목 추가 (예: 부케, 답례품)" aria-label="예산 항목 이름" maxlength="20">
+          <button class="btn" type="submit">추가</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>하객 <small>단위: 명</small></h2>
+        <p class="sub">예상 인원과 참석 확정 인원을 구분해 적어 주세요.</p>
+        <div class="guest-grid">
+          <span></span><span class="h">예상</span><span class="h">확정</span>
+          <label for="gAe">신랑측</label><input id="gAe" type="number" min="0" inputmode="numeric"><input id="gAc" type="number" min="0" inputmode="numeric" aria-label="신랑측 확정">
+          <label for="gBe">신부측</label><input id="gBe" type="number" min="0" inputmode="numeric"><input id="gBc" type="number" min="0" inputmode="numeric" aria-label="신부측 확정">
+        </div>
+        <div class="guest-sum" id="guestSum"></div>
+        <div class="field-inline"><label for="unitCost">1인 식대</label><input id="unitCost" type="number" min="0" step="0.5" inputmode="decimal"><span class="unit">만원</span></div>
+      </section>
+
+      <section class="card">
+        <h2>업체 <small id="vendorCount"></small></h2>
+        <p class="sub">상담한 업체의 진행 상태를 기록하세요.</p>
+        <div id="vendors"></div>
+        <form class="vendor-add" id="vendorAdd">
+          <input id="vName" placeholder="업체 이름" aria-label="업체 이름" maxlength="24">
+          <input id="vCat" placeholder="분류" aria-label="업체 분류" maxlength="8">
+          <button class="btn" type="submit">추가</button>
+        </form>
+      </section>
+    </div>
   </div>
-  <section class="under" id="under">
-    <div data-u="cool"><div class="r">≤ 4.0</div><div class="n">쿨톤</div><div class="d">핑크·푸른·보라색 등 차가운 색조가 도는 타입</div></div>
-    <div data-u="ncool"><div class="r">4.1 – 4.4</div><div class="n">쿨 뉴트럴</div><div class="d">붉은기·노란기가 적은 따뜻한 쿨톤 (중간 쿨톤)</div></div>
-    <div data-u="neutral"><div class="r">4.5 – 5.5</div><div class="n">뉴트럴톤</div><div class="d">중성톤 · 밸런스 최상 Neutral tone</div></div>
-    <div data-u="nwarm"><div class="r">5.6 – 5.9</div><div class="n">뉴트럴 웜</div><div class="d">살구색과 같은 중간 웜톤</div></div>
-    <div data-u="warm"><div class="r">≥ 6.0</div><div class="n">웜톤</div><div class="d">옐로우 베이스</div></div>
-  </section>
-  <p class="under-cap">YG 옐로우골드 · PG 핑크골드 · WG 화이트골드 · NW 내추럴화이트 &nbsp;|&nbsp; 유광 Polished · 무광 Matte</p>
 
   <footer>
-    <p>Two souls, one color of love.</p>
-    <small>AMORIS Wedding Jewelry · 두 분께 가장 잘 어울리는 반지를 찾아드립니다</small>
-    <div class="sign">CONSULTANT <span></span></div>
+    <span>입력한 내용은 이 브라우저에만 저장됩니다.</span>
+    <button type="button" id="resetAll">처음 상태(예시)로 되돌리기</button>
   </footer>
-</main>
+</div>
 
 <script>
 (() => {
-  const SEASONS = {
-    spring: { ko: "봄 웜", en: "Spring Warm", label: "Light warm", tone: "WARM TONE",
-              crit: "웜톤 · L* <b>63.5 이상</b>", metals: ["YG", "PG"], metal: "YG & PG", finish: "유광", mood: "맑고 따뜻한" },
-    summer: { ko: "여름 쿨", en: "Summer Cool", label: "Light cool", tone: "COOL TONE",
-              crit: "쿨톤 · L* <b>64.5 이상</b>", metals: ["NW", "WG"], metal: "NW & WG", finish: "유광 & 무광", mood: "맑고 부드러운" },
-    autumn: { ko: "가을 웜", en: "Autumn Warm", label: "Deep warm", tone: "WARM TONE",
-              crit: "웜톤 · L* <b>63.4 이하</b>", metals: ["YG", "PG", "NW"], metal: "YG & PG & NW", finish: "무광 & 유광", mood: "깊고 고급스러운" },
-    winter: { ko: "겨울 쿨", en: "Winter Cool", label: "Deep cool", tone: "COOL TONE",
-              crit: "쿨톤 · L* <b>64.4 이하</b>", metals: ["WG"], metal: "WG", finish: "유광", mood: "선명하고 세련된" },
-  };
-  const ORDER = ["spring", "summer", "autumn", "winter"];
-  const chip = (m) => `<span class="chip ${m}">${m}</span>`;
+  const KEY = "wedding-dashboard-v1";
+  const PHASES = [
+    { id: "p1", label: "12~10개월 전", due: 300 },
+    { id: "p2", label: "8~6개월 전",  due: 180 },
+    { id: "p3", label: "5~3개월 전",  due: 90 },
+    { id: "p4", label: "2~1개월 전",  due: 30 },
+    { id: "p5", label: "1주일 전",    due: 7 },
+  ];
+  const STATUS = { todo: "상담 전", talking: "상담 중", contract: "계약 완료" };
+  const uid = () => Math.random().toString(36).slice(2, 9);
 
-  // 언더톤(b*-a*) 구간
-  function undertone(ba) {
-    if (ba >= 6.0) return ["warm", "웜톤 (옐로우 베이스)"];
-    if (ba >= 5.6) return ["nwarm", "뉴트럴 웜톤"];
-    if (ba >= 4.5) return ["neutral", "뉴트럴톤"];
-    if (ba >= 4.1) return ["ncool", "쿨 뉴트럴톤"];
-    return ["cool", "쿨톤"];
+  const task = (phase, t, done = false) => ({ id: uid(), phase, t, done });
+  // 예시 예식일: 오늘부터 약 11개월 뒤 토요일 (초기 화면에서 기한이 지난 항목이 없도록)
+  function exampleDate() {
+    const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 330);
+    d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7));
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   }
-  // 웜/쿨: b*-a* 5 기준 / 계절: 웜은 L* 63.5, 쿨은 64.5 기준
-  function season(L, ba) {
-    if (ba >= 5) return L >= 63.5 ? "spring" : "autumn";
-    return L >= 64.5 ? "summer" : "winter";
-  }
-
-  const num = (s) => { const n = parseFloat(String(s).replace(",", ".")); return isFinite(n) ? n : null; };
-  const fmt = (n) => (Math.round(n * 100) / 100).toString();
-
-  // season guide cards
-  document.getElementById("guide").innerHTML = ORDER.map((k) => {
-    const s = SEASONS[k];
-    return `<div class="gcard" data-s="${k}">
-      <div class="sw"><span>${s.en.split(" ")[0]}</span><div class="who"></div></div>
-      <div class="body">
-        <div class="tone-tag">${s.tone}</div>
-        <h4>${s.ko}</h4>
-        <div class="crit">${s.crit}</div>
-        <div class="m">${s.metals.map(chip).join("")}</div>
-        <div class="mt">${s.metal} <span style="font-weight:400;color:var(--ink-soft)">(${s.finish})</span></div>
-        <div class="mood">${s.mood}</div>
-      </div></div>`;
-  }).join("");
-
-  const people = {};
-  document.querySelectorAll("[data-who]").forEach((el) => {
-    const who = el.dataset.who;
-    const box = el.querySelector(".seasons");
-    box.innerHTML = ORDER.map((k) => `<button type="button" class="season" data-s="${k}">
-      <span class="dot"></span><span class="t"><b>${SEASONS[k].en.split(" ")[0]}</b><i>${SEASONS[k].label}</i></span></button>`).join("");
-    people[who] = {
-      inputs: Object.fromEntries([...el.querySelectorAll("input")].map((i) => [i.dataset.k, i])),
-      btns: [...box.children],
-      out: el.querySelector(".result"),
-      tag: who === "female" ? "신부" : "신랑",
-      pick: null,
+  function example() {
+    return {
+      example: true,
+      a: "", b: "",
+      date: exampleDate(),
+      tasks: [
+        task("p1", "예산 총액 정하기", true), task("p1", "양가 상견례", true), task("p1", "예식장 투어와 계약", true), task("p1", "웨딩플래너·스드메 상담"),
+        task("p2", "스튜디오·드레스·메이크업 계약"), task("p2", "웨딩링 상담과 퍼스널 컬러 진단"), task("p2", "신혼여행지·항공권 예약"), task("p2", "혼수 리스트 작성"),
+        task("p3", "한복·예복 맞춤"), task("p3", "웨딩 촬영"), task("p3", "청첩장 디자인 확정"), task("p3", "신혼집 계약·인테리어"),
+        task("p4", "청첩장 발송"), task("p4", "사회·축가·부케 정하기"), task("p4", "웨딩링 수령"), task("p4", "본식 스냅·영상 확인"),
+        task("p5", "식순과 좌석 확정"), task("p5", "예식장에 최종 인원 전달"), task("p5", "축의금 접수 담당 정하기"), task("p5", "리허설과 피부 관리"),
+      ],
+      budget: [
+        { id: uid(), name: "예식장·식대", plan: 1800, spent: 300 },
+        { id: uid(), name: "스드메", plan: 450, spent: 100 },
+        { id: uid(), name: "웨딩링", plan: 300, spent: 0 },
+        { id: uid(), name: "예물·예단", plan: 500, spent: 0 },
+        { id: uid(), name: "한복·예복", plan: 200, spent: 0 },
+        { id: uid(), name: "신혼여행", plan: 600, spent: 120 },
+        { id: uid(), name: "혼수", plan: 800, spent: 0 },
+        { id: uid(), name: "기타", plan: 200, spent: 20 },
+      ],
+      guests: { ae: 120, ac: 64, be: 100, bc: 52, unit: 6.5 },
+      vendors: [
+        { id: uid(), name: "OO 웨딩홀", cat: "예식장", st: "contract" },
+        { id: uid(), name: "AMORIS Wedding Jewelry", cat: "웨딩링", st: "talking" },
+        { id: uid(), name: "OO 스튜디오", cat: "스튜디오", st: "todo" },
+      ],
     };
+  }
+
+  let S;
+  try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
+  if (!S || !Array.isArray(S.tasks)) S = example();
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const won = (n) => Math.round(n * 10) / 10;
+  const man = (n) => won(n).toLocaleString("ko-KR");
+  const pct = (a, b) => (b > 0 ? Math.min(100, Math.round((a / b) * 100)) : 0);
+  const num = (v) => { const n = parseFloat(v); return isFinite(n) && n >= 0 ? n : 0; };
+
+  const midnight = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+  const parseDate = (s) => { const [y, m, d] = String(s).split("-").map(Number); return y ? new Date(y, m - 1, d) : null; };
+  const DAY = 86400000;
+  const fmtMD = (d) => `${d.getMonth() + 1}/${d.getDate()}`;
+  const DOW = ["일", "월", "화", "수", "목", "금", "토"];
+
+  function dueDate(phaseId) {
+    const w = parseDate(S.date);
+    const p = PHASES.find((x) => x.id === phaseId);
+    return w && p ? new Date(w.getTime() - p.due * DAY) : null;
+  }
+  const daysUntil = (d) => Math.round((midnight(d) - midnight(new Date())) / DAY);
+
+  function renderHero() {
+    $("nameA").value = S.a || "";
+    $("nameB").value = S.b || "";
+    $("weddingDate").value = S.date || "";
+    const w = parseDate(S.date);
+    if (!w) { $("ddayNum").textContent = "D-?"; $("ddaySub").textContent = "예식일을 정해 주세요"; $("dateLabel").textContent = ""; return; }
+    const n = daysUntil(w);
+    $("ddayNum").textContent = n > 0 ? `D-${n}` : n === 0 ? "D-Day" : `D+${-n}`;
+    $("ddaySub").textContent = n > 0 ? `${Math.floor(n / 7)}주 ${n % 7}일 남았어요` : n === 0 ? "오늘이 예식일이에요" : "결혼을 축하드려요";
+    $("dateLabel").textContent = `${w.getFullYear()}년 ${w.getMonth() + 1}월 ${w.getDate()}일 (${DOW[w.getDay()]})`;
+  }
+
+  function renderStats() {
+    const done = S.tasks.filter((t) => t.done).length, total = S.tasks.length;
+    const plan = S.budget.reduce((a, b) => a + b.plan, 0), spent = S.budget.reduce((a, b) => a + b.spent, 0);
+    const g = S.guests, exp = g.ae + g.be, conf = g.ac + g.bc;
+    const vc = S.vendors.filter((v) => v.st === "contract").length;
+    const over = spent > plan && plan > 0;
+    $("stats").innerHTML = `
+      <div class="stat"><div class="k">체크리스트</div><div class="v num">${done}<small>/ ${total}개 완료</small></div><div class="meter"><i class="ok" style="width:${pct(done, total)}%"></i></div></div>
+      <div class="stat"><div class="k">예산 사용</div><div class="v num">${man(spent)}<small>/ ${man(plan)}만</small></div><div class="meter"><i class="${over ? "bad" : ""}" style="width:${pct(spent, plan)}%"></i></div></div>
+      <div class="stat"><div class="k">하객 확정</div><div class="v num">${conf}<small>/ 예상 ${exp}명</small></div><div class="meter"><i style="width:${pct(conf, exp)}%"></i></div></div>
+      <div class="stat"><div class="k">계약한 업체</div><div class="v num">${vc}<small>/ ${S.vendors.length}곳</small></div><div class="meter"><i class="ok" style="width:${pct(vc, S.vendors.length)}%"></i></div></div>`;
+    const p = pct(done, total);
+    $("ringPct").textContent = p + "%";
+    $("ringArc").style.strokeDashoffset = 263.9 * (1 - p / 100);
+  }
+
+  function renderNext() {
+    const list = [];
+    PHASES.forEach((p) => S.tasks.filter((t) => t.phase === p.id && !t.done).forEach((t) => list.push({ t, d: dueDate(p.id) })));
+    const top = list.slice(0, 4);
+    $("next").innerHTML = top.length
+      ? top.map(({ t, d }) => {
+          const n = d ? daysUntil(d) : null;
+          const late = n !== null && n < 0;
+          const lab = n === null ? "-" : late ? `${-n}일 지남` : n === 0 ? "오늘" : `D-${n}`;
+          return `<div class="next-item"><span class="d num ${late ? "late" : ""}">${lab}</span><span>${esc(t.t)}</span></div>`;
+        }).join("")
+      : `<div class="empty">남은 일이 없어요. 모든 준비가 끝났습니다.</div>`;
+  }
+
+  function renderPhases() {
+    $("checkCount").textContent = `${S.tasks.filter((t) => t.done).length} / ${S.tasks.length}`;
+    $("phases").innerHTML = PHASES.map((p) => {
+      const ts = S.tasks.filter((t) => t.phase === p.id);
+      const done = ts.filter((t) => t.done).length;
+      const d = dueDate(p.id);
+      const n = d ? daysUntil(d) : null;
+      const allDone = ts.length > 0 && done === ts.length;
+      const late = !allDone && n !== null && n < 0;
+      return `<div class="phase">
+        <div class="phase-h"><b>${p.label}</b><span class="due num">${d ? "~ " + fmtMD(d) : ""}</span>
+          ${allDone ? '<span class="badge ok">완료</span>' : late ? '<span class="badge late">기한 지남</span>' : ""}
+          <span class="cnt num">${done}/${ts.length}</span></div>
+        <ul class="tasks">${ts.map((t) => `<li class="task ${t.done ? "done" : ""}">
+          <label><input type="checkbox" data-task="${t.id}" ${t.done ? "checked" : ""}><span>${esc(t.t)}</span></label>
+          <button class="x" type="button" data-deltask="${t.id}" aria-label="${esc(t.t)} 삭제">×</button></li>`).join("")}</ul>
+        <form class="add" data-addtask="${p.id}"><input placeholder="할 일 추가" aria-label="${p.label} 할 일 추가" maxlength="40"><button class="btn" type="submit">추가</button></form>
+      </div>`;
+    }).join("");
+  }
+
+  function renderBudget() {
+    $("budgetRows").innerHTML = S.budget.map((b) => {
+      const over = b.spent > b.plan;
+      return `<tr>
+        <td><div class="nm">${esc(b.name)}</div><div class="bar"><i class="${over ? "bad" : ""}" style="width:${pct(b.spent, b.plan || b.spent)}%"></i></div>${over ? `<div class="over num">${man(b.spent - b.plan)}만 초과</div>` : ""}</td>
+        <td class="r"><input type="number" min="0" inputmode="decimal" value="${b.plan || ""}" data-bplan="${b.id}" aria-label="${esc(b.name)} 예산"></td>
+        <td class="r"><input type="number" min="0" inputmode="decimal" value="${b.spent || ""}" data-bspent="${b.id}" aria-label="${esc(b.name)} 지출"></td>
+        <td class="r"><button class="x" type="button" data-delbudget="${b.id}" aria-label="${esc(b.name)} 삭제">×</button></td></tr>`;
+    }).join("") || `<tr><td colspan="4" class="empty">예산 항목을 추가해 주세요.</td></tr>`;
+    const plan = S.budget.reduce((a, b) => a + b.plan, 0), spent = S.budget.reduce((a, b) => a + b.spent, 0);
+    $("budgetTotal").innerHTML = `<td>합계</td><td class="r num">${man(plan)}</td><td class="r num">${man(spent)}</td><td></td>`;
+  }
+
+  function renderGuests() {
+    const g = S.guests;
+    $("gAe").value = g.ae || ""; $("gAc").value = g.ac || ""; $("gBe").value = g.be || ""; $("gBc").value = g.bc || ""; $("unitCost").value = g.unit || "";
+    const exp = g.ae + g.be, conf = g.ac + g.bc;
+    const cost = (conf || exp) * g.unit;
+    $("guestSum").innerHTML = `
+      <div><small>확정 / 예상</small><b class="num">${conf} / ${exp}명</b></div>
+      <div><small>예상 식대 (${conf ? "확정" : "예상"} 인원 기준)</small><b class="num">${man(cost)}만원</b></div>`;
+  }
+
+  function renderVendors() {
+    $("vendorCount").textContent = `${S.vendors.length}곳`;
+    $("vendors").innerHTML = S.vendors.length ? S.vendors.map((v) => `<div class="vendor">
+      <div class="nm"><b>${esc(v.name)}</b><small>${esc(v.cat || "분류 없음")}</small></div>
+      <select data-vst="${v.id}" data-st="${v.st}" aria-label="${esc(v.name)} 진행 상태">${Object.entries(STATUS).map(([k, l]) => `<option value="${k}" ${v.st === k ? "selected" : ""}>${l}</option>`).join("")}</select>
+      <button class="x" type="button" data-delvendor="${v.id}" aria-label="${esc(v.name)} 삭제">×</button></div>`).join("")
+      : `<div class="empty">상담한 업체를 추가해 보세요.</div>`;
+  }
+
+  function render() {
+    $("exampleBar").hidden = !S.example;
+    renderHero(); renderStats(); renderNext(); renderPhases(); renderBudget(); renderGuests(); renderVendors();
+  }
+  const touch = () => { save(); render(); };
+
+  // ---- 이벤트 ----
+  $("nameA").addEventListener("input", (e) => { S.a = e.target.value; save(); });
+  $("nameB").addEventListener("input", (e) => { S.b = e.target.value; save(); });
+  $("weddingDate").addEventListener("change", (e) => { if (e.target.value) { S.date = e.target.value; touch(); } });
+
+  document.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.dataset.task) { S.tasks.find((x) => x.id === t.dataset.task).done = t.checked; touch(); }
+    else if (t.dataset.bplan) { S.budget.find((x) => x.id === t.dataset.bplan).plan = num(t.value); touch(); }
+    else if (t.dataset.bspent) { S.budget.find((x) => x.id === t.dataset.bspent).spent = num(t.value); touch(); }
+    else if (t.dataset.vst) { S.vendors.find((x) => x.id === t.dataset.vst).st = t.value; touch(); }
+    else if (["gAe", "gAc", "gBe", "gBc", "unitCost"].includes(t.id)) {
+      const k = { gAe: "ae", gAc: "ac", gBe: "be", gBc: "bc", unitCost: "unit" }[t.id];
+      S.guests[k] = num(t.value); touch();
+    }
   });
 
-  function update() {
-    const guideWho = {}, underWho = {};
-    for (const p of Object.values(people)) {
-      const L = num(p.inputs.L.value), a = num(p.inputs.a.value), b = num(p.inputs.b.value);
-      const ba = a !== null && b !== null ? Math.round((b - a) * 100) / 100 : null;
-      p.inputs.ba.value = ba === null ? "" : fmt(ba);
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.deltask) S.tasks = S.tasks.filter((x) => x.id !== b.dataset.deltask);
+    else if (b.dataset.delbudget) S.budget = S.budget.filter((x) => x.id !== b.dataset.delbudget);
+    else if (b.dataset.delvendor) S.vendors = S.vendors.filter((x) => x.id !== b.dataset.delvendor);
+    else return;
+    touch();
+  });
 
-      const auto = L !== null && ba !== null ? season(L, ba) : null;
-      const chosen = p.pick || auto;
-      p.btns.forEach((btn) => {
-        btn.classList.toggle("suggest", btn.dataset.s === auto);
-        btn.classList.toggle("on", btn.dataset.s === chosen);
-      });
-
-      if (!chosen) {
-        p.out.className = "result empty";
-        p.out.innerHTML = "L*, a*, b* 값을 입력하면<br>어울리는 계절과 웨딩링 컬러를 추천해 드립니다.";
-        continue;
-      }
-      (guideWho[chosen] ||= []).push(p.tag);
-      const s = SEASONS[chosen];
-      let gauge = "";
-      if (ba !== null) {
-        const [uKey, uLabel] = undertone(ba);
-        (underWho[uKey] ||= []).push(p.tag);
-        const pos = Math.max(0, Math.min(100, (ba - 2) / 8 * 100)); // 2 ~ 10 범위
-        gauge = `<div class="gauge">
-          <div class="gauge-top"><span>언더톤 b*−a* <strong>${fmt(ba)}</strong></span><strong>${uLabel}</strong></div>
-          <div class="bar"><i style="left:${pos}%"></i></div>
-          <div class="bar-scale"><span>Cool</span><span>Neutral</span><span>Warm</span></div></div>`;
-      }
-      p.out.className = "result";
-      p.out.innerHTML =
-        `<div class="res-season"><b>${s.ko}톤</b><em>${s.en}</em></div>
-         <div class="res-mood">${s.mood} 분위기의 웨딩링을 추천드려요</div>
-         ${gauge}
-         <div class="metals"><span class="label">Metal</span><span class="chips">${s.metals.map(chip).join("")}</span>
-           <span class="txt"><b>${s.metal}</b>${s.finish}</span></div>`;
+  document.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = e.target;
+    if (f.dataset.addtask) {
+      const i = f.querySelector("input"), v = i.value.trim();
+      if (v) { S.tasks.push(task(f.dataset.addtask, v)); touch(); }
+    } else if (f.id === "budgetAdd") {
+      const v = $("budgetName").value.trim();
+      if (v) { S.budget.push({ id: uid(), name: v, plan: 0, spent: 0 }); $("budgetName").value = ""; touch(); }
+    } else if (f.id === "vendorAdd") {
+      const v = $("vName").value.trim();
+      if (v) { S.vendors.push({ id: uid(), name: v, cat: $("vCat").value.trim(), st: "todo" }); $("vName").value = ""; $("vCat").value = ""; touch(); }
     }
-    document.querySelectorAll(".gcard").forEach((c) => {
-      const w = guideWho[c.dataset.s] || [];
-      c.classList.toggle("hit", w.length > 0);
-      c.querySelector(".who").innerHTML = w.map((t) => `<em>${t}</em>`).join("");
-    });
-    document.querySelectorAll("#under > div").forEach((d) => {
-      const w = underWho[d.dataset.u] || [];
-      d.classList.toggle("hit", w.length > 0);
-      d.dataset.who = w.join("·");
-    });
-  }
+  });
 
-  for (const p of Object.values(people)) {
-    ["L", "a", "b"].forEach((k) => p.inputs[k].addEventListener("input", update));
-    p.btns.forEach((btn) => btn.addEventListener("click", () => {
-      p.pick = p.pick === btn.dataset.s ? null : btn.dataset.s; // 상담사가 직접 선택 (다시 누르면 자동 추천으로)
-      update();
-    }));
-  }
+  $("clearExample").addEventListener("click", () => {
+    S.example = false;
+    S.tasks.forEach((t) => (t.done = false));
+    S.budget.forEach((b) => { b.plan = 0; b.spent = 0; });
+    S.guests = { ae: 0, ac: 0, be: 0, bc: 0, unit: 0 };
+    S.vendors = [];
+    touch();
+  });
+  $("resetAll").addEventListener("click", () => { S = example(); touch(); });
 
-  const dateEl = document.getElementById("date");
-  dateEl.valueAsDate = new Date();
-
-  function setValues(who, L, a, b, pick) {
-    const p = people[who];
-    p.inputs.L.value = L; p.inputs.a.value = a; p.inputs.b.value = b; p.pick = pick;
-  }
-  // 테스트용 예시: [이름, 신부 L/a/b, 신랑 L/a/b, 신랑 수동선택]
-  const SAMPLES = [
-    ["원본 시트 (신부 봄 · 신랑 상담사 가을 선택)", ["66.27", "8.27", "17.48", "김신부"], ["66.81", "9.58", "15.34", "이신랑"], "autumn"],
-    ["봄 웜 + 여름 쿨", ["66.0", "7.5", "15.0", "박봄"], ["66.5", "8.0", "11.5", "최여름"]],
-    ["가을 웜 + 겨울 쿨", ["61.8", "9.2", "17.0", "정가을"], ["62.0", "10.1", "13.9", "한겨울"]],
-    ["경계값 (L* 63.5 봄 · L* 64.5 여름)", ["63.5", "8.0", "14.0", "윤경계"], ["64.5", "9.0", "13.9", "강경계"]],
-    ["뉴트럴톤 (b*−a* 4.5 / 5.0)", ["64.4", "8.6", "13.1", "서뉴트럴"], ["63.4", "9.0", "14.0", "오뉴트럴"]],
-    ["쿨 뉴트럴 (b*−a* 4.2 / 4.3)", ["65.2", "8.8", "13.0", "임쿨"], ["60.5", "10.0", "14.3", "장쿨"]],
-  ];
-  const sampleEl = document.getElementById("sample");
-  SAMPLES.forEach(([label], i) => sampleEl.add(new Option(`예시 ${i + 1}. ${label}`, i)));
-  sampleEl.onchange = () => {
-    const c = SAMPLES[sampleEl.value];
-    if (!c) return;
-    const [, f, m, mPick = null] = c;
-    setValues("female", f[0], f[1], f[2], null);
-    setValues("male", m[0], m[1], m[2], mPick);
-    document.getElementById("name-female").value = f[3];
-    document.getElementById("name-male").value = m[3];
-    update();
-  };
-  document.getElementById("reset").onclick = () => {
-    for (const p of Object.values(people)) {
-      Object.values(p.inputs).forEach((i) => (i.value = ""));
-      p.pick = null;
-    }
-    document.getElementById("name-female").value = "";
-    document.getElementById("name-male").value = "";
-    dateEl.valueAsDate = new Date();
-    sampleEl.value = "";
-    update();
-  };
-  update();
+  render();
 })();
 </script>
 </body>
