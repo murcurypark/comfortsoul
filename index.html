@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMORIS 퍼스널 톤 시트</title>
+<style>
+  :root {
+    --warm: #f1d9b5;
+    --warm-deep: #f0c98c;
+    --cool: #cfe0ea;
+    --cool-deep: #c3d3e6;
+    --gray: #b9bfc0;
+    --ink: #222;
+    --line: #222;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px; background: #e8ecea; color: var(--ink);
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  }
+  .sheet {
+    max-width: 820px; margin: 0 auto; background: #fff; padding: 28px 24px 36px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.15);
+  }
+  header { text-align: center; margin-bottom: 20px; }
+  header h1 { margin: 0; font: 700 44px/1 Georgia, "Times New Roman", serif; letter-spacing: .12em; }
+  header p { margin: 4px 0 0; font: 400 18px Georgia, serif; letter-spacing: .1em; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  h2 { font-size: 14px; margin: 0 0 4px; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border: 2px solid var(--line); padding: 6px 8px; font-size: 14px; text-align: center; }
+  .eval td { height: 44px; }
+  .eval td.k { background: #fff; font-weight: 700; width: 17%; }
+  .eval td.v { width: 22%; padding: 0; background: #fff; }
+  .eval input {
+    width: 100%; height: 100%; min-height: 40px; border: 0; background: transparent;
+    text-align: center; font: 600 16px inherit; font-family: inherit; color: #1a3a8a;
+  }
+  .eval input:focus { outline: 2px solid #1a3a8a; outline-offset: -2px; }
+  .eval td.l { text-align: left; }
+  .eval tr.r1 td.l, .eval tr.r1 td.s { background: var(--warm); }
+  .eval tr.r2 td.l, .eval tr.r2 td.s { background: var(--cool); }
+  .eval tr.r3 td.l, .eval tr.r3 td.s { background: var(--warm-deep); }
+  .eval tr.r4 td.l, .eval tr.r4 td.s { background: var(--cool-deep); }
+  .eval td.mark { width: 14%; cursor: pointer; background: #fff; user-select: none; }
+  .eval td.mark::after {
+    content: ""; display: inline-block; width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid transparent;
+  }
+  .eval td.mark.on::after { border-color: var(--ink); }
+  .eval td.mark:hover::after { border-color: #aaa; }
+  .eval td.mark.on:hover::after { border-color: var(--ink); }
+
+  .tone { margin-top: 28px; width: 100%; }
+  .tone th { background: #fff; font-weight: 700; }
+  .tone .warm { background: var(--warm); }
+  .tone .cool { background: var(--cool); }
+  .tone .grp-warm { background: var(--warm-deep); font-weight: 700; }
+  .tone .grp-cool { background: var(--gray); font-weight: 700; }
+  .tone .lcell { background: #f6efe3; font-weight: 600; }
+  .tone tr.hit td { box-shadow: inset 0 0 0 3px #c0392b; }
+  .tone small { display: block; font-weight: 400; }
+
+  .notes { margin: 22px 0 0; padding: 0; list-style: none; font-size: 13px; line-height: 1.9; }
+  .notes b { font-size: 14px; }
+  .notes li.hit { background: #fdf0c8; font-weight: 700; }
+
+  .result {
+    margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  }
+  .card { border: 2px solid var(--line); padding: 12px 14px; font-size: 14px; line-height: 1.7; min-height: 110px; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; }
+  .card .big { font-size: 20px; font-weight: 700; }
+  .card.empty { color: #888; }
+
+  .tools { max-width: 820px; margin: 0 auto 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-size: 14px; padding: 8px 14px; border: 1px solid #555; background: #fff; cursor: pointer; border-radius: 4px;
+  }
+  button:hover { background: #f2f2f2; }
+
+  @media (max-width: 640px) {
+    body { padding: 8px; }
+    .sheet { padding: 16px 10px 24px; }
+    .pair, .result { grid-template-columns: 1fr; }
+    header h1 { font-size: 34px; }
+  }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .sheet { box-shadow: none; padding: 0; max-width: none; }
+    .tools { display: none; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="tools">
+  <button type="button" id="sample">예시 값 불러오기</button>
+  <button type="button" id="reset">초기화</button>
+  <button type="button" onclick="window.print()">인쇄</button>
+</div>
+
+<main class="sheet">
+  <header>
+    <h1>AMORIS</h1>
+    <p>WEDDING JEWELRY</p>
+  </header>
+
+  <section class="pair">
+    <div data-who="female">
+      <h2>Female</h2>
+      <table class="eval">
+        <tr class="r1"><td class="k">L*</td><td class="v"><input inputmode="decimal" data-k="L" aria-label="Female L*"></td><td class="l">Light warm</td><td class="s">Spring</td><td class="mark" data-row="0"></td></tr>
+        <tr class="r2"><td class="k">a*</td><td class="v"><input inputmode="decimal" data-k="a" aria-label="Female a*"></td><td class="l">Light Cool</td><td class="s">Summer</td><td class="mark" data-row="1"></td></tr>
+        <tr class="r3"><td class="k">b*</td><td class="v"><input inputmode="decimal" data-k="b" aria-label="Female b*"></td><td class="l">Deep Warm</td><td class="s">Autumn</td><td class="mark" data-row="2"></td></tr>
+        <tr class="r4"><td class="k">b* - a*</td><td class="v"><input data-k="ba" readonly tabindex="-1" aria-label="Female b*-a*"></td><td class="l">Deep Cool</td><td class="s">Winter</td><td class="mark" data-row="3"></td></tr>
+      </table>
+    </div>
+    <div data-who="male">
+      <h2>Male</h2>
+      <table class="eval">
+        <tr class="r1"><td class="k">L*</td><td class="v"><input inputmode="decimal" data-k="L" aria-label="Male L*"></td><td class="l">Light warm</td><td class="s">Spring</td><td class="mark" data-row="0"></td></tr>
+        <tr class="r2"><td class="k">a*</td><td class="v"><input inputmode="decimal" data-k="a" aria-label="Male a*"></td><td class="l">Light Cool</td><td class="s">Summer</td><td class="mark" data-row="1"></td></tr>
+        <tr class="r3"><td class="k">b*</td><td class="v"><input inputmode="decimal" data-k="b" aria-label="Male b*"></td><td class="l">Deep Warm</td><td class="s">Autumn</td><td class="mark" data-row="2"></td></tr>
+        <tr class="r4"><td class="k">b* - a*</td><td class="v"><input data-k="ba" readonly tabindex="-1" aria-label="Male b*-a*"></td><td class="l">Deep Cool</td><td class="s">Winter</td><td class="mark" data-row="3"></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="result">
+    <div class="card empty" id="res-female"></div>
+    <div class="card empty" id="res-male"></div>
+  </section>
+
+  <table class="tone">
+    <tr><th style="width:12%">톤</th><th style="width:14%">L*</th><th style="width:12%">계절</th><th colspan="1"></th><th style="width:26%"></th></tr>
+    <tr data-season="spring">
+      <td class="grp-warm" rowspan="2">웜톤<br>5 이상</td>
+      <td class="lcell">63.5 ▲</td>
+      <td class="warm">봄</td>
+      <td class="warm" rowspan="2">봄웜/가을웜 (웜톤 Warm Tone)<br><br>차분하고 혈색 있어 보임</td>
+      <td class="warm">YG &amp; PG (유광)<small>맑고 따뜻</small></td>
+    </tr>
+    <tr data-season="autumn">
+      <td class="lcell">63.4 ▼</td>
+      <td class="warm">가을</td>
+      <td class="warm">YG &amp; PG &amp; NW (무&amp;유광)<small>깊고 고급스러운</small></td>
+    </tr>
+    <tr data-season="summer">
+      <td class="grp-cool" rowspan="2">쿨톤<br>5 미만</td>
+      <td class="lcell">64.5 ▲</td>
+      <td class="cool">여름</td>
+      <td class="cool" rowspan="2">여름쿨/겨울쿨 (쿨톤 Cool Tone)<br><br>화사하고 생기 있어 보임</td>
+      <td class="cool">NW &amp; WG (유&amp;무)<small>맑고 부드러운</small></td>
+    </tr>
+    <tr data-season="winter">
+      <td class="lcell">64.4 ▼</td>
+      <td class="cool">겨울</td>
+      <td class="cool">WG (유광)<small>선명하고 세련된</small></td>
+    </tr>
+  </table>
+
+  <ul class="notes" id="notes">
+    <li><b>언더톤 ▶ b* - a*</b></li>
+    <li data-u="warm">* 6.0 이상 ▶ 웜톤 (옐로우 베이스)</li>
+    <li data-u="nwarm">* 5.6~5.9 ▶ 뉴트럴 웜톤 (중간 웜톤) (웜톤과 쿨톤의 중간의 살구색과 같은 웜톤)</li>
+    <li data-u="neutral">* 4.5~5.5 ▶ 뉴트럴톤 (중성톤 / 발란스 최상) Neutral tone</li>
+    <li data-u="ncool">* 4.1~4.4 ▶ 쿨 뉴트럴 톤 (중간 쿨톤) (쿨톤과 웜톤의 중간의 붉은 기나 노란기가 적은 따뜻한 쿨톤)</li>
+    <li data-u="cool">* 4.0 이하 ▶ 쿨톤 (핑크, 푸른, 보라색 등 차가운 색조가 도는 타입)</li>
+  </ul>
+</main>
+
+<script>
+(() => {
+  const SEASONS = {
+    spring: { ko: "봄", en: "Spring", metal: "YG & PG (유광)", feel: "맑고 따뜻", tone: "웜톤" },
+    autumn: { ko: "가을", en: "Autumn", metal: "YG & PG & NW (무&유광)", feel: "깊고 고급스러운", tone: "웜톤" },
+    summer: { ko: "여름", en: "Summer", metal: "NW & WG (유&무)", feel: "맑고 부드러운", tone: "쿨톤" },
+    winter: { ko: "겨울", en: "Winter", metal: "WG (유광)", feel: "선명하고 세련된", tone: "쿨톤" },
+  };
+  const ROW_SEASON = ["spring", "summer", "autumn", "winter"];
+
+  // 언더톤(b*-a*) 구간 — 시트 하단 표 기준
+  function undertone(ba) {
+    if (ba >= 6.0) return ["warm", "웜톤 (옐로우 베이스)"];
+    if (ba >= 5.6) return ["nwarm", "뉴트럴 웜톤 (중간 웜톤)"];
+    if (ba >= 4.5) return ["neutral", "뉴트럴톤 (중성톤 / 발란스 최상)"];
+    if (ba >= 4.1) return ["ncool", "쿨 뉴트럴 톤 (중간 쿨톤)"];
+    return ["cool", "쿨톤"];
+  }
+
+  // 웜/쿨 구분: b*-a* 5 이상 웜, 5 미만 쿨 / 계절: 웜은 L* 63.5 기준, 쿨은 64.5 기준
+  function season(L, ba) {
+    if (ba >= 5) return L >= 63.5 ? "spring" : "autumn";
+    return L >= 64.5 ? "summer" : "winter";
+  }
+
+  const num = (s) => { const n = parseFloat(String(s).replace(",", ".")); return isFinite(n) ? n : null; };
+  const fmt = (n) => (Math.round(n * 100) / 100).toString();
+
+  const people = {};
+  document.querySelectorAll("[data-who]").forEach((el) => {
+    const who = el.dataset.who;
+    people[who] = {
+      el,
+      inputs: Object.fromEntries([...el.querySelectorAll("input")].map((i) => [i.dataset.k, i])),
+      marks: [...el.querySelectorAll(".mark")],
+      out: document.getElementById("res-" + who),
+      label: who === "female" ? "Female" : "Male",
+    };
+  });
+
+  function update() {
+    const hits = new Set(), under = new Set();
+    for (const p of Object.values(people)) {
+      const L = num(p.inputs.L.value), a = num(p.inputs.a.value), b = num(p.inputs.b.value);
+      const ba = a !== null && b !== null ? Math.round((b - a) * 100) / 100 : null;
+      p.inputs.ba.value = ba === null ? "" : fmt(ba);
+
+      if (L === null || ba === null) {
+        p.out.className = "card empty";
+        p.out.innerHTML = `<h3>${p.label} 판정</h3>L*, a*, b* 값을 입력하면 자동으로 판정됩니다.`;
+        continue;
+      }
+      const s = SEASONS[season(L, ba)];
+      const [uKey, uLabel] = undertone(ba);
+      hits.add(season(L, ba)); under.add(uKey);
+      p.out.className = "card";
+      p.out.innerHTML =
+        `<h3>${p.label} 판정</h3>` +
+        `<div class="big">${s.ko} ${s.tone} (${s.en})</div>` +
+        `언더톤 b*-a* = ${fmt(ba)} → ${uLabel}<br>` +
+        `추천 금속: ${s.metal} · ${s.feel}`;
+    }
+    document.querySelectorAll(".tone tr[data-season]").forEach((tr) =>
+      tr.classList.toggle("hit", hits.has(tr.dataset.season)));
+    document.querySelectorAll("#notes li[data-u]").forEach((li) =>
+      li.classList.toggle("hit", under.has(li.dataset.u)));
+  }
+
+  for (const p of Object.values(people)) {
+    ["L", "a", "b"].forEach((k) => p.inputs[k].addEventListener("input", update));
+    p.marks.forEach((m) => m.addEventListener("click", () => {
+      const on = m.classList.contains("on");
+      p.marks.forEach((x) => x.classList.remove("on"));
+      if (!on) m.classList.add("on");
+    }));
+  }
+
+  function setValues(who, L, a, b, row) {
+    const p = people[who];
+    p.inputs.L.value = L; p.inputs.a.value = a; p.inputs.b.value = b;
+    p.marks.forEach((m, i) => m.classList.toggle("on", i === row));
+  }
+  document.getElementById("sample").onclick = () => {
+    setValues("female", "66.27", "8.27", "17.48", 0);
+    setValues("male", "66.81", "9.58", "15.34", 2);
+    update();
+  };
+  document.getElementById("reset").onclick = () => {
+    for (const p of Object.values(people)) {
+      Object.values(p.inputs).forEach((i) => (i.value = ""));
+      p.marks.forEach((m) => m.classList.remove("on"));
+    }
+    update();
+  };
+  update();
+})();
+</script>
+</body>
+</html>
