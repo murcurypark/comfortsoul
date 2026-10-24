@@ -53,6 +53,10 @@
     border-radius: 999px; cursor: pointer; transition: all .2s;
   }
   .tools button:hover { background: var(--gold); border-color: var(--gold); color: #fff; }
+  .tools select {
+    font: 400 13px var(--sans); color: var(--ink); padding: 9px 14px; border: 1px solid var(--gold-soft);
+    background: rgba(255,255,255,.7); border-radius: 999px; cursor: pointer; max-width: 100%;
+  }
 
   /* ---------- sheet ---------- */
   .sheet {
@@ -283,7 +287,9 @@
 </head>
 <body>
 <div class="tools">
-  <button type="button" id="sample">예시 값 불러오기</button>
+  <select id="sample" aria-label="테스트용 예시">
+    <option value="">테스트용 예시 선택…</option>
+  </select>
   <button type="button" id="reset">초기화</button>
   <button type="button" onclick="window.print()">인쇄 / PDF 저장</button>
 </div>
@@ -500,9 +506,25 @@
     const p = people[who];
     p.inputs.L.value = L; p.inputs.a.value = a; p.inputs.b.value = b; p.pick = pick;
   }
-  document.getElementById("sample").onclick = () => {
-    setValues("female", "66.27", "8.27", "17.48", null);
-    setValues("male", "66.81", "9.58", "15.34", "autumn");
+  // 테스트용 예시: [이름, 신부 L/a/b, 신랑 L/a/b, 신랑 수동선택]
+  const SAMPLES = [
+    ["원본 시트 (신부 봄 · 신랑 상담사 가을 선택)", ["66.27", "8.27", "17.48", "김신부"], ["66.81", "9.58", "15.34", "이신랑"], "autumn"],
+    ["봄 웜 + 여름 쿨", ["66.0", "7.5", "15.0", "박봄"], ["66.5", "8.0", "11.5", "최여름"]],
+    ["가을 웜 + 겨울 쿨", ["61.8", "9.2", "17.0", "정가을"], ["62.0", "10.1", "13.9", "한겨울"]],
+    ["경계값 (L* 63.5 봄 · L* 64.5 여름)", ["63.5", "8.0", "14.0", "윤경계"], ["64.5", "9.0", "13.9", "강경계"]],
+    ["뉴트럴톤 (b*−a* 4.5 / 5.0)", ["64.4", "8.6", "13.1", "서뉴트럴"], ["63.4", "9.0", "14.0", "오뉴트럴"]],
+    ["쿨 뉴트럴 (b*−a* 4.2 / 4.3)", ["65.2", "8.8", "13.0", "임쿨"], ["60.5", "10.0", "14.3", "장쿨"]],
+  ];
+  const sampleEl = document.getElementById("sample");
+  SAMPLES.forEach(([label], i) => sampleEl.add(new Option(`예시 ${i + 1}. ${label}`, i)));
+  sampleEl.onchange = () => {
+    const c = SAMPLES[sampleEl.value];
+    if (!c) return;
+    const [, f, m, mPick = null] = c;
+    setValues("female", f[0], f[1], f[2], null);
+    setValues("male", m[0], m[1], m[2], mPick);
+    document.getElementById("name-female").value = f[3];
+    document.getElementById("name-male").value = m[3];
     update();
   };
   document.getElementById("reset").onclick = () => {
@@ -513,6 +535,7 @@
     document.getElementById("name-female").value = "";
     document.getElementById("name-male").value = "";
     dateEl.valueAsDate = new Date();
+    sampleEl.value = "";
     update();
   };
   update();
