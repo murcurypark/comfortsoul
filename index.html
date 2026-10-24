@@ -157,6 +157,9 @@
   .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
   .bar i.bad { background: var(--bad); }
   .over { font-size: 11px; color: var(--bad); }
+  tr.grp td { background: var(--surface-2); font: 700 12.5px var(--body); padding: 6px 8px; border-top: 0; letter-spacing: .02em; }
+  tr.grp td:first-child { border-radius: 8px 0 0 8px; } tr.grp td:last-child { border-radius: 0 8px 8px 0; }
+  .add select { border: 1px dashed var(--line); background: transparent; border-radius: 10px; padding: 7px 8px; max-width: 8em; }
   tfoot td { border-top: 2px solid var(--line); font-weight: 700; }
   .unit { font-size: 11.5px; color: var(--ink-2); }
 
@@ -259,14 +262,15 @@
     <div class="col">
       <section class="card">
         <h2>예산 <small>단위: 만원</small></h2>
-        <p class="sub">항목별로 계획한 금액과 지금까지 쓴 금액을 적어 주세요.</p>
+        <p class="sub">항목별로 계획한 금액과 쓴 금액을 적어 주세요. 신혼집 보증금은 포함하지 않았습니다.</p>
         <div class="table-scroll"><table>
           <thead><tr><th>항목</th><th class="r">예산</th><th class="r">지출</th><th></th></tr></thead>
           <tbody id="budgetRows"></tbody>
           <tfoot><tr id="budgetTotal"></tr></tfoot>
         </table></div>
         <form class="add" id="budgetAdd" style="margin-top:14px">
-          <input id="budgetName" placeholder="항목 추가 (예: 부케, 답례품)" aria-label="예산 항목 이름" maxlength="20">
+          <select id="budgetGroup" aria-label="예산 묶음"></select>
+          <input id="budgetName" placeholder="항목 추가 (예: 폐백, 하객 버스)" aria-label="예산 항목 이름" maxlength="24">
           <button class="btn" type="submit">추가</button>
         </form>
       </section>
@@ -304,18 +308,21 @@
 
 <script>
 (() => {
-  const KEY = "wedding-dashboard-v1";
+  const KEY = "wedding-dashboard-v2";
   const PHASES = [
     { id: "p1", label: "12~10개월 전", due: 300 },
     { id: "p2", label: "8~6개월 전",  due: 180 },
     { id: "p3", label: "5~3개월 전",  due: 90 },
     { id: "p4", label: "2~1개월 전",  due: 30 },
     { id: "p5", label: "1주일 전",    due: 7 },
+    { id: "p6", label: "예식 후 2주 안", due: -14 },
   ];
+  const GROUPS = ["예식", "스드메·꾸밈", "예물·예단", "신혼 준비", "기타"];
   const STATUS = { todo: "상담 전", talking: "상담 중", contract: "계약 완료" };
   const uid = () => Math.random().toString(36).slice(2, 9);
 
   const task = (phase, t, done = false) => ({ id: uid(), phase, t, done });
+  const item = (g, name, plan, spent) => ({ id: uid(), g, name, plan, spent });
   // 예시 예식일: 오늘부터 약 11개월 뒤 토요일 (초기 화면에서 기한이 지난 항목이 없도록)
   function exampleDate() {
     const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 330);
@@ -328,21 +335,40 @@
       a: "지수", b: "성수",
       date: exampleDate(),
       tasks: [
-        task("p1", "예산 총액 정하기", true), task("p1", "양가 상견례", true), task("p1", "예식장 투어와 계약", true), task("p1", "웨딩플래너·스드메 상담"),
-        task("p2", "스튜디오·드레스·메이크업 계약"), task("p2", "웨딩링 상담과 퍼스널 컬러 진단"), task("p2", "신혼여행지·항공권 예약"), task("p2", "혼수 리스트 작성"),
-        task("p3", "한복·예복 맞춤"), task("p3", "웨딩 촬영"), task("p3", "청첩장 디자인 확정"), task("p3", "신혼집 계약·인테리어"),
-        task("p4", "청첩장 발송"), task("p4", "사회·축가·부케 정하기"), task("p4", "웨딩링 수령"), task("p4", "본식 스냅·영상 확인"),
-        task("p5", "식순과 좌석 확정"), task("p5", "예식장에 최종 인원 전달"), task("p5", "축의금 접수 담당 정하기"), task("p5", "리허설과 피부 관리"),
+        // 12~10개월 전
+        task("p1", "결혼 시기와 예산 총액 정하기", true), task("p1", "양가 인사와 상견례 날짜 잡기", true), task("p1", "상견례 식당 예약", true),
+        task("p1", "예식장 3곳 이상 투어 후 계약", true), task("p1", "웨딩플래너·스드메 상담 예약"), task("p1", "예물·예단·혼수 범위를 양가와 협의"), task("p1", "하객 명단 초안 작성"),
+        // 8~6개월 전
+        task("p2", "스튜디오·드레스·메이크업 업체 계약"), task("p2", "웨딩링 상담과 퍼스널 컬러 진단"), task("p2", "예물(시계·가방·주얼리) 정하기"),
+        task("p2", "신혼여행지 정하고 항공·숙소 예약"), task("p2", "여권 만료일 확인 (입국 시 6개월 이상 남아야 함)"), task("p2", "신혼집 구하기와 계약"),
+        task("p2", "본식 스냅·영상 업체 비교"), task("p2", "결혼 전 건강검진 예약"),
+        // 5~3개월 전
+        task("p3", "웨딩 촬영 일정과 콘셉트 확정"), task("p3", "드레스 투어와 본식 드레스 확정"), task("p3", "웨딩링 디자인·사이즈 확정하고 주문"),
+        task("p3", "한복 맞춤·대여 (신랑·신부·양가 혼주)"), task("p3", "신랑 예복과 구두 맞춤"), task("p3", "혼수 가전·가구 구매"),
+        task("p3", "사회·축가·주례 섭외"), task("p3", "청첩장 디자인과 문구 확정"),
+        // 2~1개월 전
+        task("p4", "모바일·종이 청첩장 발송"), task("p4", "웨딩링 수령과 각인 확인"), task("p4", "혼주 메이크업·헤어 예약"),
+        task("p4", "부케·부토니에·꽃장식 확정"), task("p4", "예단·이바지 전달"), task("p4", "신혼여행 환전과 여행자 보험 가입"),
+        task("p4", "이사 날짜와 업체 확정"), task("p4", "식전 영상·포토테이블 사진 준비"), task("p4", "피부 관리와 네일 예약"),
+        // 1주일 전
+        task("p5", "예식장에 최종 보증 인원과 식순 전달"), task("p5", "좌석 배치와 식권 확정"), task("p5", "축의금 접수 담당자 정하기"),
+        task("p5", "양가 어머니 일정과 이동 동선 확인"), task("p5", "방명록·봉투·서명펜 등 소품 챙기기"), task("p5", "업체별 잔금 결제 일정 정리"),
+        task("p5", "신혼여행 짐 싸기"),
+        // 예식 후
+        task("p6", "혼인신고"), task("p6", "업체 잔금·추가금 최종 정산"), task("p6", "축의금 내역 정리"), task("p6", "감사 인사와 답례품 전달"),
+        task("p6", "전입신고와 주소 변경"), task("p6", "원본 사진·영상 수령과 앨범 확정"), task("p6", "보험·통장·청약 정보 정리"),
       ],
+      // 금액은 일반적인 수준을 가정한 예시입니다 (만원). 신혼집 보증금은 제외.
       budget: [
-        { id: uid(), name: "예식장·식대", plan: 1800, spent: 300 },
-        { id: uid(), name: "스드메", plan: 450, spent: 100 },
-        { id: uid(), name: "웨딩링", plan: 300, spent: 0 },
-        { id: uid(), name: "예물·예단", plan: 500, spent: 0 },
-        { id: uid(), name: "한복·예복", plan: 200, spent: 0 },
-        { id: uid(), name: "신혼여행", plan: 600, spent: 120 },
-        { id: uid(), name: "혼수", plan: 800, spent: 0 },
-        { id: uid(), name: "기타", plan: 200, spent: 20 },
+        item("예식", "예식장 대관·식대", 1800, 300), item("예식", "본식 스냅·영상", 150, 0), item("예식", "부케·꽃장식", 40, 0),
+        item("예식", "사회·축가·주례 사례", 50, 0), item("예식", "혼주 메이크업·헤어", 40, 0), item("예식", "청첩장", 50, 0),
+        item("스드메·꾸밈", "스드메 패키지", 400, 100), item("스드메·꾸밈", "드레스·메이크업 추가금", 100, 0), item("스드메·꾸밈", "한복 (신랑·신부·혼주)", 250, 0),
+        item("스드메·꾸밈", "신랑 예복·구두", 100, 0), item("스드메·꾸밈", "피부 관리·네일", 100, 0),
+        item("예물·예단", "웨딩링", 300, 0), item("예물·예단", "예물 (시계·가방·주얼리)", 500, 0), item("예물·예단", "예단·이바지", 300, 0),
+        item("신혼 준비", "신혼여행 (항공·숙박·현지)", 700, 120), item("신혼 준비", "여행 준비 (환전·보험·짐)", 80, 0),
+        item("신혼 준비", "혼수 (가전·가구)", 800, 0), item("신혼 준비", "이사·청소·인테리어", 200, 0),
+        item("기타", "상견례 식사", 30, 30), item("기타", "답례품·감사 선물", 80, 0), item("기타", "서류·혼인신고 수수료", 5, 0),
+        item("기타", "예비비 (총액의 약 10%)", 400, 0),
       ],
       guests: { ae: 120, ac: 64, be: 100, bc: 52, unit: 6.5 },
       vendors: [
@@ -446,16 +472,22 @@
   }
 
   function renderBudget() {
-    $("budgetRows").innerHTML = S.budget.map((b) => {
+    const sum = (arr, k) => arr.reduce((x, y) => x + y[k], 0);
+    const row = (b) => {
       const over = b.spent > b.plan;
       return `<tr>
         <td><div class="nm">${esc(b.name)}</div><div class="bar"><i class="${over ? "bad" : ""}" style="width:${pct(b.spent, b.plan || b.spent)}%"></i></div>${over ? `<div class="over num">${man(b.spent - b.plan)}만 초과</div>` : ""}</td>
         <td class="r"><input type="number" min="0" inputmode="decimal" value="${b.plan || ""}" data-bplan="${b.id}" aria-label="${esc(b.name)} 예산"></td>
         <td class="r"><input type="number" min="0" inputmode="decimal" value="${b.spent || ""}" data-bspent="${b.id}" aria-label="${esc(b.name)} 지출"></td>
         <td class="r"><button class="x" type="button" data-delbudget="${b.id}" aria-label="${esc(b.name)} 삭제">×</button></td></tr>`;
-    }).join("") || `<tr><td colspan="4" class="empty">예산 항목을 추가해 주세요.</td></tr>`;
-    const plan = S.budget.reduce((a, b) => a + b.plan, 0), spent = S.budget.reduce((a, b) => a + b.spent, 0);
-    $("budgetTotal").innerHTML = `<td>합계</td><td class="r num">${man(plan)}</td><td class="r num">${man(spent)}</td><td></td>`;
+    };
+    const html = GROUPS.map((g) => {
+      const items = S.budget.filter((b) => (b.g || "기타") === g);
+      if (!items.length) return "";
+      return `<tr class="grp"><td>${g}</td><td class="r num">${man(sum(items, "plan"))}</td><td class="r num">${man(sum(items, "spent"))}</td><td></td></tr>` + items.map(row).join("");
+    }).join("");
+    $("budgetRows").innerHTML = html || `<tr><td colspan="4" class="empty">예산 항목을 추가해 주세요.</td></tr>`;
+    $("budgetTotal").innerHTML = `<td>합계</td><td class="r num">${man(sum(S.budget, "plan"))}</td><td class="r num">${man(sum(S.budget, "spent"))}</td><td></td>`;
   }
 
   function renderGuests() {
@@ -521,7 +553,7 @@
       if (v) { S.tasks.push(task(f.dataset.addtask, v)); touch(); }
     } else if (f.id === "budgetAdd") {
       const v = $("budgetName").value.trim();
-      if (v) { S.budget.push({ id: uid(), name: v, plan: 0, spent: 0 }); $("budgetName").value = ""; touch(); }
+      if (v) { S.budget.push(item($("budgetGroup").value, v, 0, 0)); $("budgetName").value = ""; touch(); }
     } else if (f.id === "vendorAdd") {
       const v = $("vName").value.trim();
       if (v) { S.vendors.push({ id: uid(), name: v, cat: $("vCat").value.trim(), st: "todo" }); $("vName").value = ""; $("vCat").value = ""; touch(); }
@@ -538,6 +570,8 @@
   });
   $("resetAll").addEventListener("click", () => { S = example(); touch(); });
 
+  $("budgetGroup").innerHTML = GROUPS.map((g) => `<option>${g}</option>`).join("");
+  $("budgetGroup").value = "기타";
   render();
 })();
 </script>
