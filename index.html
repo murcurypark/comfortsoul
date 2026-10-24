@@ -3,93 +3,280 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AMORIS 퍼스널 톤 시트</title>
+<title>AMORIS 퍼스널 컬러 시트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+KR:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --warm: #f1d9b5;
-    --warm-deep: #f0c98c;
-    --cool: #cfe0ea;
-    --cool-deep: #c3d3e6;
-    --gray: #b9bfc0;
-    --ink: #222;
-    --line: #222;
+    --ivory: #fbf8f3;
+    --paper: #ffffff;
+    --blush: #f4e9e4;
+    --gold: #b8955a;
+    --gold-soft: #d9c39a;
+    --gold-line: #e6d6b8;
+    --ink: #3a3330;
+    --ink-soft: #7a6f69;
+    --ink-faint: #a89d96;
+
+    --spring: #f6c9a8;
+    --spring-2: #fbe3c4;
+    --summer: #c9d6ea;
+    --summer-2: #e6d4e4;
+    --autumn: #c98d5c;
+    --autumn-2: #e3b98a;
+    --winter: #5e6f9a;
+    --winter-2: #b9c3dc;
+
+    --serif-en: "Cormorant Garamond", Georgia, serif;
+    --serif-ko: "Noto Serif KR", "Nanum Myeongjo", serif;
+    --sans: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0; padding: 16px; background: #e8ecea; color: var(--ink);
-    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    margin: 0; padding: 32px 16px 48px; color: var(--ink);
+    font-family: var(--sans); font-weight: 400;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #f7ece6 0%, transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, #f3eadb 0%, transparent 55%),
+      var(--ivory);
+    -webkit-font-smoothing: antialiased;
   }
+
+  /* ---------- toolbar ---------- */
+  .tools {
+    max-width: 880px; margin: 0 auto 16px; display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;
+  }
+  .tools button {
+    font: 400 13px var(--sans); letter-spacing: .04em; color: var(--ink);
+    padding: 9px 18px; border: 1px solid var(--gold-soft); background: rgba(255,255,255,.7);
+    border-radius: 999px; cursor: pointer; transition: all .2s;
+  }
+  .tools button:hover { background: var(--gold); border-color: var(--gold); color: #fff; }
+
+  /* ---------- sheet ---------- */
   .sheet {
-    max-width: 820px; margin: 0 auto; background: #fff; padding: 28px 24px 36px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.15);
+    position: relative; max-width: 880px; margin: 0 auto; background: var(--paper);
+    padding: 56px 56px 44px; border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(80,60,40,.06), 0 18px 50px -20px rgba(120,90,60,.25);
   }
-  header { text-align: center; margin-bottom: 20px; }
-  header h1 { margin: 0; font: 700 44px/1 Georgia, "Times New Roman", serif; letter-spacing: .12em; }
-  header p { margin: 4px 0 0; font: 400 18px Georgia, serif; letter-spacing: .1em; }
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  h2 { font-size: 14px; margin: 0 0 4px; }
-  table { border-collapse: collapse; width: 100%; }
-  td, th { border: 2px solid var(--line); padding: 6px 8px; font-size: 14px; text-align: center; }
-  .eval td { height: 44px; }
-  .eval td.k { background: #fff; font-weight: 700; width: 17%; }
-  .eval td.v { width: 22%; padding: 0; background: #fff; }
-  .eval input {
-    width: 100%; height: 100%; min-height: 40px; border: 0; background: transparent;
-    text-align: center; font: 600 16px inherit; font-family: inherit; color: #1a3a8a;
+  .sheet::before, .sheet::after {
+    content: ""; position: absolute; pointer-events: none; border: 1px solid var(--gold-line);
   }
-  .eval input:focus { outline: 2px solid #1a3a8a; outline-offset: -2px; }
-  .eval td.l { text-align: left; }
-  .eval tr.r1 td.l, .eval tr.r1 td.s { background: var(--warm); }
-  .eval tr.r2 td.l, .eval tr.r2 td.s { background: var(--cool); }
-  .eval tr.r3 td.l, .eval tr.r3 td.s { background: var(--warm-deep); }
-  .eval tr.r4 td.l, .eval tr.r4 td.s { background: var(--cool-deep); }
-  .eval td.mark { width: 14%; cursor: pointer; background: #fff; user-select: none; }
-  .eval td.mark::after {
-    content: ""; display: inline-block; width: 26px; height: 26px; border-radius: 50%;
-    border: 2px solid transparent;
+  .sheet::before { inset: 14px; }
+  .sheet::after { inset: 19px; border-color: rgba(230,214,184,.55); }
+
+  header { text-align: center; position: relative; }
+  .crown { width: 220px; height: 34px; color: var(--gold); display: block; margin: 0 auto 6px; }
+  .brand {
+    margin: 0; font: 500 54px/1 var(--serif-en); letter-spacing: .22em; padding-left: .22em; color: var(--ink);
   }
-  .eval td.mark.on::after { border-color: var(--ink); }
-  .eval td.mark:hover::after { border-color: #aaa; }
-  .eval td.mark.on:hover::after { border-color: var(--ink); }
-
-  .tone { margin-top: 28px; width: 100%; }
-  .tone th { background: #fff; font-weight: 700; }
-  .tone .warm { background: var(--warm); }
-  .tone .cool { background: var(--cool); }
-  .tone .grp-warm { background: var(--warm-deep); font-weight: 700; }
-  .tone .grp-cool { background: var(--gray); font-weight: 700; }
-  .tone .lcell { background: #f6efe3; font-weight: 600; }
-  .tone tr.hit td { box-shadow: inset 0 0 0 3px #c0392b; }
-  .tone small { display: block; font-weight: 400; }
-
-  .notes { margin: 22px 0 0; padding: 0; list-style: none; font-size: 13px; line-height: 1.9; }
-  .notes b { font-size: 14px; }
-  .notes li.hit { background: #fdf0c8; font-weight: 700; }
-
-  .result {
-    margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  .brand-sub {
+    margin: 10px 0 0; font: 500 14px var(--serif-en); letter-spacing: .5em; padding-left: .5em; color: var(--gold);
   }
-  .card { border: 2px solid var(--line); padding: 12px 14px; font-size: 14px; line-height: 1.7; min-height: 110px; }
-  .card h3 { margin: 0 0 6px; font-size: 15px; }
-  .card .big { font-size: 20px; font-weight: 700; }
-  .card.empty { color: #888; }
-
-  .tools { max-width: 820px; margin: 0 auto 12px; display: flex; gap: 8px; flex-wrap: wrap; }
-  button {
-    font: inherit; font-size: 14px; padding: 8px 14px; border: 1px solid #555; background: #fff; cursor: pointer; border-radius: 4px;
+  .title-ko {
+    margin: 28px 0 4px; font: 500 20px var(--serif-ko); letter-spacing: .12em;
   }
-  button:hover { background: #f2f2f2; }
+  .title-en {
+    margin: 0; font: italic 400 16px var(--serif-en); color: var(--ink-soft); letter-spacing: .04em;
+  }
+  .divider {
+    display: flex; align-items: center; gap: 14px; margin: 26px auto 30px; max-width: 360px; color: var(--gold-soft);
+  }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: currentColor; }
+  .divider span { font-size: 10px; color: var(--gold); }
 
-  @media (max-width: 640px) {
-    body { padding: 8px; }
-    .sheet { padding: 16px 10px 24px; }
-    .pair, .result { grid-template-columns: 1fr; }
-    header h1 { font-size: 34px; }
+  /* ---------- couple info ---------- */
+  .info {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 34px;
+  }
+  .field label {
+    display: block; font: 500 11px var(--serif-en); letter-spacing: .25em; text-transform: uppercase; color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .field label span { font: 400 11px var(--sans); letter-spacing: .05em; color: var(--ink-faint); margin-left: 4px; text-transform: none; }
+  .field input {
+    width: 100%; border: 0; border-bottom: 1px solid var(--gold-line); padding: 6px 2px; background: transparent;
+    font: 400 15px var(--serif-ko); color: var(--ink);
+  }
+  .field input:focus { outline: none; border-bottom-color: var(--gold); }
+
+  /* ---------- person panels ---------- */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .panel {
+    border: 1px solid var(--gold-line); border-radius: 14px; padding: 22px 22px 20px; background: linear-gradient(180deg, #fffdfa, #fff);
+  }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
+  .panel-head h2 { margin: 0; font: 500 26px var(--serif-en); letter-spacing: .08em; }
+  .panel-head h2 small { font: 400 13px var(--serif-ko); color: var(--ink-soft); letter-spacing: .1em; margin-left: 8px; }
+  .panel-head .ring { width: 26px; height: 26px; color: var(--gold); }
+
+  .lab { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+  .lab label {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 8px;
+    border-radius: 10px; background: var(--ivory); border: 1px solid transparent; transition: border-color .2s;
+  }
+  .lab label:focus-within { border-color: var(--gold-soft); background: #fff; }
+  .lab span { font: italic 500 15px var(--serif-en); color: var(--gold); }
+  .lab input {
+    width: 100%; border: 0; background: transparent; text-align: center; padding: 0;
+    font: 500 18px var(--serif-en); color: var(--ink); letter-spacing: .02em;
+  }
+  .lab input:focus { outline: none; }
+  .lab input::placeholder { color: #d4cbc3; }
+  .lab label.calc { background: transparent; border: 1px dashed var(--gold-line); }
+
+  .seasons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .season {
+    position: relative; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid #efe7dc; background: #fff; cursor: pointer; text-align: left; font: inherit; color: inherit;
+    transition: all .2s;
+  }
+  .season:hover { border-color: var(--gold-soft); }
+  .season .dot { flex: none; width: 26px; height: 26px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.05); }
+  .season .t { display: flex; flex-direction: column; line-height: 1.25; }
+  .season .t b { font: 500 15px var(--serif-en); letter-spacing: .04em; }
+  .season .t i { font: normal 400 11px var(--sans); color: var(--ink-soft); }
+  .season[data-s="spring"] .dot { background: linear-gradient(135deg, var(--spring-2), var(--spring)); }
+  .season[data-s="summer"] .dot { background: linear-gradient(135deg, var(--summer-2), var(--summer)); }
+  .season[data-s="autumn"] .dot { background: linear-gradient(135deg, var(--autumn-2), var(--autumn)); }
+  .season[data-s="winter"] .dot { background: linear-gradient(135deg, var(--winter-2), var(--winter)); }
+  .season.suggest::after {
+    content: "추천"; position: absolute; top: -8px; right: 8px; font: 500 10px var(--sans); letter-spacing: .1em;
+    background: var(--gold); color: #fff; padding: 2px 7px; border-radius: 999px;
+  }
+  .season.on { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 6px 16px -8px rgba(184,149,90,.6); }
+  .season.on .dot { box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--gold); }
+
+  /* result */
+  .result { margin-top: 18px; padding-top: 18px; border-top: 1px solid #f0e8dc; min-height: 168px; }
+  .result.empty { display: flex; align-items: center; justify-content: center; text-align: center; color: var(--ink-faint); font-size: 13px; line-height: 1.7; }
+  .res-season { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .res-season b { font: 500 24px var(--serif-ko); letter-spacing: .06em; }
+  .res-season em { font: italic 400 18px var(--serif-en); color: var(--gold); }
+  .res-mood { margin: 2px 0 14px; font-size: 13px; color: var(--ink-soft); }
+
+  .gauge { margin-bottom: 14px; }
+  .gauge-top { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-soft); margin-bottom: 6px; }
+  .gauge-top strong { color: var(--ink); font-weight: 500; }
+  .bar {
+    position: relative; height: 6px; border-radius: 99px;
+    background: linear-gradient(90deg, #c8cfe6 0%, #ddd3e2 35%, #efe2d6 50%, #f3d2ac 70%, #e7b37a 100%);
+  }
+  .bar i {
+    position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+    background: #fff; border: 2px solid var(--gold); box-shadow: 0 1px 4px rgba(0,0,0,.15); transition: left .4s;
+  }
+  .bar-scale { display: flex; justify-content: space-between; font: 400 10px var(--sans); color: var(--ink-faint); margin-top: 5px; }
+
+  .metals { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--ivory); border-radius: 10px; }
+  .metals .label { font: 500 10px var(--serif-en); letter-spacing: .25em; color: var(--gold); text-transform: uppercase; }
+  .metals .chips { display: flex; gap: 6px; }
+  .metals .txt { margin-left: auto; text-align: right; font-size: 12px; line-height: 1.5; }
+  .metals .txt b { display: block; font: 500 13px var(--sans); }
+
+  .chip {
+    width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+    font: 600 8.5px var(--sans); letter-spacing: .02em; color: rgba(60,45,30,.75);
+    box-shadow: inset 0 -2px 4px rgba(0,0,0,.12), inset 0 2px 4px rgba(255,255,255,.7), 0 1px 2px rgba(0,0,0,.12);
+  }
+  .chip.YG { background: radial-gradient(circle at 35% 30%, #fff4cc, #e4c26e 45%, #b78f35); }
+  .chip.PG { background: radial-gradient(circle at 35% 30%, #ffe9e0, #e6b39e 45%, #b97b66); }
+  .chip.WG { background: radial-gradient(circle at 35% 30%, #ffffff, #dfe2e6 45%, #a9afb7); }
+  .chip.NW { background: radial-gradient(circle at 35% 30%, #fffdf6, #ece4d4 45%, #bdb19b); }
+
+  /* ---------- section titles ---------- */
+  .sec-title { text-align: center; margin: 46px 0 20px; }
+  .sec-title h3 { margin: 0; font: 500 22px var(--serif-en); letter-spacing: .16em; }
+  .sec-title p { margin: 4px 0 0; font: 400 13px var(--serif-ko); color: var(--ink-soft); letter-spacing: .08em; }
+
+  /* ---------- season guide ---------- */
+  .guide { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .gcard {
+    position: relative; border-radius: 14px; overflow: hidden; background: #fff; border: 1px solid #efe7dc;
+    transition: box-shadow .3s, border-color .3s;
+  }
+  .gcard .sw { height: 64px; position: relative; }
+  .gcard[data-s="spring"] .sw { background: linear-gradient(135deg, #fff3e2, var(--spring-2) 40%, var(--spring)); }
+  .gcard[data-s="summer"] .sw { background: linear-gradient(135deg, #f6f0f6, var(--summer-2) 40%, var(--summer)); }
+  .gcard[data-s="autumn"] .sw { background: linear-gradient(135deg, #f6e3c8, var(--autumn-2) 40%, var(--autumn)); }
+  .gcard[data-s="winter"] .sw { background: linear-gradient(135deg, #e3e7f2, var(--winter-2) 40%, var(--winter)); }
+  .gcard .sw span {
+    position: absolute; left: 14px; bottom: 8px; font: italic 500 22px var(--serif-en); color: rgba(255,255,255,.95);
+    text-shadow: 0 1px 6px rgba(0,0,0,.15);
+  }
+  .gcard[data-s="spring"] .sw span, .gcard[data-s="summer"] .sw span { color: rgba(90,70,60,.8); text-shadow: none; }
+  .gcard .body { padding: 12px 14px 14px; }
+  .gcard .tone-tag { font: 500 10px var(--sans); letter-spacing: .12em; color: var(--ink-soft); }
+  .gcard h4 { margin: 2px 0 8px; font: 500 18px var(--serif-ko); }
+  .gcard .crit { font-size: 11.5px; color: var(--ink-soft); line-height: 1.6; padding-bottom: 10px; border-bottom: 1px solid #f2ebe0; }
+  .gcard .crit b { color: var(--ink); font-weight: 500; }
+  .gcard .m { display: flex; gap: 4px; margin: 10px 0 6px; }
+  .gcard .m .chip { width: 24px; height: 24px; font-size: 7.5px; }
+  .gcard .mt { font-size: 12px; font-weight: 500; }
+  .gcard .mood { font: 400 12px var(--serif-ko); color: var(--gold); margin-top: 2px; }
+  .gcard.hit { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 12px 28px -14px rgba(184,149,90,.7); }
+  .gcard .who { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; }
+  .gcard .who em {
+    font: normal 500 10px var(--sans); background: rgba(255,255,255,.92); color: var(--ink); padding: 2px 7px; border-radius: 99px;
+  }
+
+  .tone-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .tone-notes div {
+    padding: 12px 16px; border-radius: 12px; font-size: 12.5px; line-height: 1.6; color: var(--ink-soft);
+  }
+  .tone-notes b { display: block; color: var(--ink); font: 500 14px var(--serif-ko); }
+  .tone-notes .w { background: linear-gradient(90deg, #fdf3e8, #fbf7f1); }
+  .tone-notes .c { background: linear-gradient(90deg, #eef1f8, #f7f5f9); }
+
+  /* ---------- undertone scale ---------- */
+  .under { display: grid; grid-template-columns: repeat(5, 1fr); border-radius: 14px; overflow: hidden; border: 1px solid #efe7dc; }
+  .under div { padding: 14px 12px; position: relative; transition: background .3s; }
+  .under div + div { border-left: 1px solid rgba(255,255,255,.7); }
+  .under .r { font: 500 17px var(--serif-en); letter-spacing: .02em; }
+  .under .n { font: 500 12.5px var(--sans); margin: 2px 0 4px; }
+  .under .d { font-size: 11px; color: var(--ink-soft); line-height: 1.5; }
+  .under [data-u="cool"] { background: #e6eaf5; }
+  .under [data-u="ncool"] { background: #eeeaf3; }
+  .under [data-u="neutral"] { background: #f6f0ea; }
+  .under [data-u="nwarm"] { background: #fbeadb; }
+  .under [data-u="warm"] { background: #f8e0c4; }
+  .under div.hit { box-shadow: inset 0 0 0 2px var(--gold); }
+  .under div.hit::after {
+    content: attr(data-who); position: absolute; top: 8px; right: 8px; font: 500 10px var(--sans);
+    color: #fff; background: var(--gold); padding: 1px 7px; border-radius: 99px;
+  }
+  .under-cap { text-align: center; font-size: 11.5px; color: var(--ink-faint); margin-top: 10px; letter-spacing: .03em; }
+
+  footer { text-align: center; margin-top: 44px; }
+  footer p { margin: 0; font: italic 400 17px var(--serif-en); color: var(--gold); letter-spacing: .06em; }
+  footer small { display: block; margin-top: 6px; font-size: 11px; color: var(--ink-faint); letter-spacing: .04em; }
+  footer .sign { display: flex; justify-content: flex-end; gap: 10px; align-items: flex-end; margin-top: 26px; font-size: 11px; color: var(--ink-soft); letter-spacing: .1em; }
+  footer .sign span { display: inline-block; width: 140px; border-bottom: 1px solid var(--gold-line); height: 18px; }
+
+  @media (max-width: 760px) {
+    body { padding: 12px 8px 32px; }
+    .sheet { padding: 40px 24px 32px; }
+    .sheet::before { inset: 8px; } .sheet::after { inset: 12px; }
+    .brand { font-size: 40px; }
+    .info { grid-template-columns: 1fr; gap: 14px; }
+    .pair, .tone-notes { grid-template-columns: 1fr; }
+    .guide { grid-template-columns: 1fr 1fr; }
+    .under { grid-template-columns: 1fr; }
+    .under div + div { border-left: 0; border-top: 1px solid rgba(255,255,255,.7); }
+  }
+  @media (max-width: 400px) {
+    .sheet { padding: 36px 16px 28px; }
+    .lab { gap: 5px; }
+    .lab input { font-size: 16px; }
   }
   @media print {
+    @page { size: A4; margin: 8mm; }
     body { background: #fff; padding: 0; }
-    .sheet { box-shadow: none; padding: 0; max-width: none; }
     .tools { display: none; }
+    .sheet { box-shadow: none; max-width: none; padding: 36px 40px 28px; }
+    .sec-title { margin: 26px 0 12px; }
+    footer { margin-top: 24px; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
@@ -98,99 +285,117 @@
 <div class="tools">
   <button type="button" id="sample">예시 값 불러오기</button>
   <button type="button" id="reset">초기화</button>
-  <button type="button" onclick="window.print()">인쇄</button>
+  <button type="button" onclick="window.print()">인쇄 / PDF 저장</button>
 </div>
 
 <main class="sheet">
   <header>
-    <h1>AMORIS</h1>
-    <p>WEDDING JEWELRY</p>
+    <svg class="crown" viewBox="0 0 220 34" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true">
+      <path d="M8 24c18-10 40-12 62-4 10 4 18 4 24 0M212 24c-18-10-40-12-62-4-10 4-18 4-24 0" stroke-linecap="round"/>
+      <path d="M30 18c-6-6-2-12 4-10M190 18c6-6 2-12-4-10" stroke-linecap="round"/>
+      <path d="M96 27l-4-16 9 7 9-13 9 13 9-7-4 16z" fill="currentColor" fill-opacity=".12" stroke-linejoin="round"/>
+      <circle cx="92" cy="9.5" r="1.8" fill="currentColor"/><circle cx="110" cy="3.5" r="1.8" fill="currentColor"/><circle cx="128" cy="9.5" r="1.8" fill="currentColor"/>
+      <path d="M95 30h30" stroke-linecap="round"/>
+    </svg>
+    <h1 class="brand">AMORIS</h1>
+    <p class="brand-sub">WEDDING JEWELRY</p>
+    <p class="title-ko">웨딩링 퍼스널 컬러 진단</p>
+    <p class="title-en">Personal Color Consultation for Your Wedding Rings</p>
+    <div class="divider"><span>◆</span></div>
   </header>
 
+  <section class="info">
+    <div class="field"><label>Bride <span>신부</span></label><input id="name-female" placeholder="성함"></div>
+    <div class="field"><label>Groom <span>신랑</span></label><input id="name-male" placeholder="성함"></div>
+    <div class="field"><label>Date <span>진단일</span></label><input id="date" type="date"></div>
+  </section>
+
   <section class="pair">
-    <div data-who="female">
-      <h2>Female</h2>
-      <table class="eval">
-        <tr class="r1"><td class="k">L*</td><td class="v"><input inputmode="decimal" data-k="L" aria-label="Female L*"></td><td class="l">Light warm</td><td class="s">Spring</td><td class="mark" data-row="0"></td></tr>
-        <tr class="r2"><td class="k">a*</td><td class="v"><input inputmode="decimal" data-k="a" aria-label="Female a*"></td><td class="l">Light Cool</td><td class="s">Summer</td><td class="mark" data-row="1"></td></tr>
-        <tr class="r3"><td class="k">b*</td><td class="v"><input inputmode="decimal" data-k="b" aria-label="Female b*"></td><td class="l">Deep Warm</td><td class="s">Autumn</td><td class="mark" data-row="2"></td></tr>
-        <tr class="r4"><td class="k">b* - a*</td><td class="v"><input data-k="ba" readonly tabindex="-1" aria-label="Female b*-a*"></td><td class="l">Deep Cool</td><td class="s">Winter</td><td class="mark" data-row="3"></td></tr>
-      </table>
-    </div>
-    <div data-who="male">
-      <h2>Male</h2>
-      <table class="eval">
-        <tr class="r1"><td class="k">L*</td><td class="v"><input inputmode="decimal" data-k="L" aria-label="Male L*"></td><td class="l">Light warm</td><td class="s">Spring</td><td class="mark" data-row="0"></td></tr>
-        <tr class="r2"><td class="k">a*</td><td class="v"><input inputmode="decimal" data-k="a" aria-label="Male a*"></td><td class="l">Light Cool</td><td class="s">Summer</td><td class="mark" data-row="1"></td></tr>
-        <tr class="r3"><td class="k">b*</td><td class="v"><input inputmode="decimal" data-k="b" aria-label="Male b*"></td><td class="l">Deep Warm</td><td class="s">Autumn</td><td class="mark" data-row="2"></td></tr>
-        <tr class="r4"><td class="k">b* - a*</td><td class="v"><input data-k="ba" readonly tabindex="-1" aria-label="Male b*-a*"></td><td class="l">Deep Cool</td><td class="s">Winter</td><td class="mark" data-row="3"></td></tr>
-      </table>
-    </div>
+    <article class="panel" data-who="female">
+      <div class="panel-head">
+        <h2>Bride<small>신부 · Female</small></h2>
+        <svg class="ring" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="13" cy="16" r="7.5"/><path d="M10 6.5l3-3.5 3 3.5-3 2.5z" fill="currentColor" fill-opacity=".25" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="lab">
+        <label><span>L*</span><input inputmode="decimal" data-k="L" placeholder="00.00" aria-label="신부 L*"></label>
+        <label><span>a*</span><input inputmode="decimal" data-k="a" placeholder="00.00" aria-label="신부 a*"></label>
+        <label><span>b*</span><input inputmode="decimal" data-k="b" placeholder="00.00" aria-label="신부 b*"></label>
+        <label class="calc"><span>b*−a*</span><input data-k="ba" readonly tabindex="-1" placeholder="auto" aria-label="신부 b*-a*"></label>
+      </div>
+      <div class="seasons"></div>
+      <div class="result empty"></div>
+    </article>
+
+    <article class="panel" data-who="male">
+      <div class="panel-head">
+        <h2>Groom<small>신랑 · Male</small></h2>
+        <svg class="ring" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="13" cy="14" r="8.5"/><circle cx="13" cy="14" r="6"/></svg>
+      </div>
+      <div class="lab">
+        <label><span>L*</span><input inputmode="decimal" data-k="L" placeholder="00.00" aria-label="신랑 L*"></label>
+        <label><span>a*</span><input inputmode="decimal" data-k="a" placeholder="00.00" aria-label="신랑 a*"></label>
+        <label><span>b*</span><input inputmode="decimal" data-k="b" placeholder="00.00" aria-label="신랑 b*"></label>
+        <label class="calc"><span>b*−a*</span><input data-k="ba" readonly tabindex="-1" placeholder="auto" aria-label="신랑 b*-a*"></label>
+      </div>
+      <div class="seasons"></div>
+      <div class="result empty"></div>
+    </article>
   </section>
 
-  <section class="result">
-    <div class="card empty" id="res-female"></div>
-    <div class="card empty" id="res-male"></div>
+  <div class="sec-title">
+    <h3>SEASON &amp; METAL GUIDE</h3>
+    <p>계절별 어울리는 웨딩링 컬러</p>
+  </div>
+  <section class="guide" id="guide"></section>
+  <div class="tone-notes">
+    <div class="w"><b>봄웜 · 가을웜 — Warm Tone</b>b*−a* 5 이상 · 차분하고 혈색 있어 보임</div>
+    <div class="c"><b>여름쿨 · 겨울쿨 — Cool Tone</b>b*−a* 5 미만 · 화사하고 생기 있어 보임</div>
+  </div>
+
+  <div class="sec-title">
+    <h3>UNDERTONE</h3>
+    <p>언더톤 ▸ b* − a*</p>
+  </div>
+  <section class="under" id="under">
+    <div data-u="cool"><div class="r">≤ 4.0</div><div class="n">쿨톤</div><div class="d">핑크·푸른·보라색 등 차가운 색조가 도는 타입</div></div>
+    <div data-u="ncool"><div class="r">4.1 – 4.4</div><div class="n">쿨 뉴트럴</div><div class="d">붉은기·노란기가 적은 따뜻한 쿨톤 (중간 쿨톤)</div></div>
+    <div data-u="neutral"><div class="r">4.5 – 5.5</div><div class="n">뉴트럴톤</div><div class="d">중성톤 · 밸런스 최상 Neutral tone</div></div>
+    <div data-u="nwarm"><div class="r">5.6 – 5.9</div><div class="n">뉴트럴 웜</div><div class="d">살구색과 같은 중간 웜톤</div></div>
+    <div data-u="warm"><div class="r">≥ 6.0</div><div class="n">웜톤</div><div class="d">옐로우 베이스</div></div>
   </section>
+  <p class="under-cap">YG 옐로우골드 · PG 핑크골드 · WG 화이트골드 · NW 내추럴화이트 &nbsp;|&nbsp; 유광 Polished · 무광 Matte</p>
 
-  <table class="tone">
-    <tr><th style="width:12%">톤</th><th style="width:14%">L*</th><th style="width:12%">계절</th><th colspan="1"></th><th style="width:26%"></th></tr>
-    <tr data-season="spring">
-      <td class="grp-warm" rowspan="2">웜톤<br>5 이상</td>
-      <td class="lcell">63.5 ▲</td>
-      <td class="warm">봄</td>
-      <td class="warm" rowspan="2">봄웜/가을웜 (웜톤 Warm Tone)<br><br>차분하고 혈색 있어 보임</td>
-      <td class="warm">YG &amp; PG (유광)<small>맑고 따뜻</small></td>
-    </tr>
-    <tr data-season="autumn">
-      <td class="lcell">63.4 ▼</td>
-      <td class="warm">가을</td>
-      <td class="warm">YG &amp; PG &amp; NW (무&amp;유광)<small>깊고 고급스러운</small></td>
-    </tr>
-    <tr data-season="summer">
-      <td class="grp-cool" rowspan="2">쿨톤<br>5 미만</td>
-      <td class="lcell">64.5 ▲</td>
-      <td class="cool">여름</td>
-      <td class="cool" rowspan="2">여름쿨/겨울쿨 (쿨톤 Cool Tone)<br><br>화사하고 생기 있어 보임</td>
-      <td class="cool">NW &amp; WG (유&amp;무)<small>맑고 부드러운</small></td>
-    </tr>
-    <tr data-season="winter">
-      <td class="lcell">64.4 ▼</td>
-      <td class="cool">겨울</td>
-      <td class="cool">WG (유광)<small>선명하고 세련된</small></td>
-    </tr>
-  </table>
-
-  <ul class="notes" id="notes">
-    <li><b>언더톤 ▶ b* - a*</b></li>
-    <li data-u="warm">* 6.0 이상 ▶ 웜톤 (옐로우 베이스)</li>
-    <li data-u="nwarm">* 5.6~5.9 ▶ 뉴트럴 웜톤 (중간 웜톤) (웜톤과 쿨톤의 중간의 살구색과 같은 웜톤)</li>
-    <li data-u="neutral">* 4.5~5.5 ▶ 뉴트럴톤 (중성톤 / 발란스 최상) Neutral tone</li>
-    <li data-u="ncool">* 4.1~4.4 ▶ 쿨 뉴트럴 톤 (중간 쿨톤) (쿨톤과 웜톤의 중간의 붉은 기나 노란기가 적은 따뜻한 쿨톤)</li>
-    <li data-u="cool">* 4.0 이하 ▶ 쿨톤 (핑크, 푸른, 보라색 등 차가운 색조가 도는 타입)</li>
-  </ul>
+  <footer>
+    <p>Two souls, one color of love.</p>
+    <small>AMORIS Wedding Jewelry · 두 분께 가장 잘 어울리는 반지를 찾아드립니다</small>
+    <div class="sign">CONSULTANT <span></span></div>
+  </footer>
 </main>
 
 <script>
 (() => {
   const SEASONS = {
-    spring: { ko: "봄", en: "Spring", metal: "YG & PG (유광)", feel: "맑고 따뜻", tone: "웜톤" },
-    autumn: { ko: "가을", en: "Autumn", metal: "YG & PG & NW (무&유광)", feel: "깊고 고급스러운", tone: "웜톤" },
-    summer: { ko: "여름", en: "Summer", metal: "NW & WG (유&무)", feel: "맑고 부드러운", tone: "쿨톤" },
-    winter: { ko: "겨울", en: "Winter", metal: "WG (유광)", feel: "선명하고 세련된", tone: "쿨톤" },
+    spring: { ko: "봄 웜", en: "Spring Warm", label: "Light warm", tone: "WARM TONE",
+              crit: "웜톤 · L* <b>63.5 이상</b>", metals: ["YG", "PG"], metal: "YG & PG", finish: "유광", mood: "맑고 따뜻한" },
+    summer: { ko: "여름 쿨", en: "Summer Cool", label: "Light cool", tone: "COOL TONE",
+              crit: "쿨톤 · L* <b>64.5 이상</b>", metals: ["NW", "WG"], metal: "NW & WG", finish: "유광 & 무광", mood: "맑고 부드러운" },
+    autumn: { ko: "가을 웜", en: "Autumn Warm", label: "Deep warm", tone: "WARM TONE",
+              crit: "웜톤 · L* <b>63.4 이하</b>", metals: ["YG", "PG", "NW"], metal: "YG & PG & NW", finish: "무광 & 유광", mood: "깊고 고급스러운" },
+    winter: { ko: "겨울 쿨", en: "Winter Cool", label: "Deep cool", tone: "COOL TONE",
+              crit: "쿨톤 · L* <b>64.4 이하</b>", metals: ["WG"], metal: "WG", finish: "유광", mood: "선명하고 세련된" },
   };
-  const ROW_SEASON = ["spring", "summer", "autumn", "winter"];
+  const ORDER = ["spring", "summer", "autumn", "winter"];
+  const chip = (m) => `<span class="chip ${m}">${m}</span>`;
 
-  // 언더톤(b*-a*) 구간 — 시트 하단 표 기준
+  // 언더톤(b*-a*) 구간
   function undertone(ba) {
     if (ba >= 6.0) return ["warm", "웜톤 (옐로우 베이스)"];
-    if (ba >= 5.6) return ["nwarm", "뉴트럴 웜톤 (중간 웜톤)"];
-    if (ba >= 4.5) return ["neutral", "뉴트럴톤 (중성톤 / 발란스 최상)"];
-    if (ba >= 4.1) return ["ncool", "쿨 뉴트럴 톤 (중간 쿨톤)"];
+    if (ba >= 5.6) return ["nwarm", "뉴트럴 웜톤"];
+    if (ba >= 4.5) return ["neutral", "뉴트럴톤"];
+    if (ba >= 4.1) return ["ncool", "쿨 뉴트럴톤"];
     return ["cool", "쿨톤"];
   }
-
-  // 웜/쿨 구분: b*-a* 5 이상 웜, 5 미만 쿨 / 계절: 웜은 L* 63.5 기준, 쿨은 64.5 기준
+  // 웜/쿨: b*-a* 5 기준 / 계절: 웜은 L* 63.5, 쿨은 64.5 기준
   function season(L, ba) {
     if (ba >= 5) return L >= 63.5 ? "spring" : "autumn";
     return L >= 64.5 ? "summer" : "winter";
@@ -199,70 +404,115 @@
   const num = (s) => { const n = parseFloat(String(s).replace(",", ".")); return isFinite(n) ? n : null; };
   const fmt = (n) => (Math.round(n * 100) / 100).toString();
 
+  // season guide cards
+  document.getElementById("guide").innerHTML = ORDER.map((k) => {
+    const s = SEASONS[k];
+    return `<div class="gcard" data-s="${k}">
+      <div class="sw"><span>${s.en.split(" ")[0]}</span><div class="who"></div></div>
+      <div class="body">
+        <div class="tone-tag">${s.tone}</div>
+        <h4>${s.ko}</h4>
+        <div class="crit">${s.crit}</div>
+        <div class="m">${s.metals.map(chip).join("")}</div>
+        <div class="mt">${s.metal} <span style="font-weight:400;color:var(--ink-soft)">(${s.finish})</span></div>
+        <div class="mood">${s.mood}</div>
+      </div></div>`;
+  }).join("");
+
   const people = {};
   document.querySelectorAll("[data-who]").forEach((el) => {
     const who = el.dataset.who;
+    const box = el.querySelector(".seasons");
+    box.innerHTML = ORDER.map((k) => `<button type="button" class="season" data-s="${k}">
+      <span class="dot"></span><span class="t"><b>${SEASONS[k].en.split(" ")[0]}</b><i>${SEASONS[k].label}</i></span></button>`).join("");
     people[who] = {
-      el,
       inputs: Object.fromEntries([...el.querySelectorAll("input")].map((i) => [i.dataset.k, i])),
-      marks: [...el.querySelectorAll(".mark")],
-      out: document.getElementById("res-" + who),
-      label: who === "female" ? "Female" : "Male",
+      btns: [...box.children],
+      out: el.querySelector(".result"),
+      tag: who === "female" ? "신부" : "신랑",
+      pick: null,
     };
   });
 
   function update() {
-    const hits = new Set(), under = new Set();
+    const guideWho = {}, underWho = {};
     for (const p of Object.values(people)) {
       const L = num(p.inputs.L.value), a = num(p.inputs.a.value), b = num(p.inputs.b.value);
       const ba = a !== null && b !== null ? Math.round((b - a) * 100) / 100 : null;
       p.inputs.ba.value = ba === null ? "" : fmt(ba);
 
-      if (L === null || ba === null) {
-        p.out.className = "card empty";
-        p.out.innerHTML = `<h3>${p.label} 판정</h3>L*, a*, b* 값을 입력하면 자동으로 판정됩니다.`;
+      const auto = L !== null && ba !== null ? season(L, ba) : null;
+      const chosen = p.pick || auto;
+      p.btns.forEach((btn) => {
+        btn.classList.toggle("suggest", btn.dataset.s === auto);
+        btn.classList.toggle("on", btn.dataset.s === chosen);
+      });
+
+      if (!chosen) {
+        p.out.className = "result empty";
+        p.out.innerHTML = "L*, a*, b* 값을 입력하면<br>어울리는 계절과 웨딩링 컬러를 추천해 드립니다.";
         continue;
       }
-      const s = SEASONS[season(L, ba)];
-      const [uKey, uLabel] = undertone(ba);
-      hits.add(season(L, ba)); under.add(uKey);
-      p.out.className = "card";
+      (guideWho[chosen] ||= []).push(p.tag);
+      const s = SEASONS[chosen];
+      let gauge = "";
+      if (ba !== null) {
+        const [uKey, uLabel] = undertone(ba);
+        (underWho[uKey] ||= []).push(p.tag);
+        const pos = Math.max(0, Math.min(100, (ba - 2) / 8 * 100)); // 2 ~ 10 범위
+        gauge = `<div class="gauge">
+          <div class="gauge-top"><span>언더톤 b*−a* <strong>${fmt(ba)}</strong></span><strong>${uLabel}</strong></div>
+          <div class="bar"><i style="left:${pos}%"></i></div>
+          <div class="bar-scale"><span>Cool</span><span>Neutral</span><span>Warm</span></div></div>`;
+      }
+      p.out.className = "result";
       p.out.innerHTML =
-        `<h3>${p.label} 판정</h3>` +
-        `<div class="big">${s.ko} ${s.tone} (${s.en})</div>` +
-        `언더톤 b*-a* = ${fmt(ba)} → ${uLabel}<br>` +
-        `추천 금속: ${s.metal} · ${s.feel}`;
+        `<div class="res-season"><b>${s.ko}톤</b><em>${s.en}</em></div>
+         <div class="res-mood">${s.mood} 분위기의 웨딩링을 추천드려요</div>
+         ${gauge}
+         <div class="metals"><span class="label">Metal</span><span class="chips">${s.metals.map(chip).join("")}</span>
+           <span class="txt"><b>${s.metal}</b>${s.finish}</span></div>`;
     }
-    document.querySelectorAll(".tone tr[data-season]").forEach((tr) =>
-      tr.classList.toggle("hit", hits.has(tr.dataset.season)));
-    document.querySelectorAll("#notes li[data-u]").forEach((li) =>
-      li.classList.toggle("hit", under.has(li.dataset.u)));
+    document.querySelectorAll(".gcard").forEach((c) => {
+      const w = guideWho[c.dataset.s] || [];
+      c.classList.toggle("hit", w.length > 0);
+      c.querySelector(".who").innerHTML = w.map((t) => `<em>${t}</em>`).join("");
+    });
+    document.querySelectorAll("#under > div").forEach((d) => {
+      const w = underWho[d.dataset.u] || [];
+      d.classList.toggle("hit", w.length > 0);
+      d.dataset.who = w.join("·");
+    });
   }
 
   for (const p of Object.values(people)) {
     ["L", "a", "b"].forEach((k) => p.inputs[k].addEventListener("input", update));
-    p.marks.forEach((m) => m.addEventListener("click", () => {
-      const on = m.classList.contains("on");
-      p.marks.forEach((x) => x.classList.remove("on"));
-      if (!on) m.classList.add("on");
+    p.btns.forEach((btn) => btn.addEventListener("click", () => {
+      p.pick = p.pick === btn.dataset.s ? null : btn.dataset.s; // 상담사가 직접 선택 (다시 누르면 자동 추천으로)
+      update();
     }));
   }
 
-  function setValues(who, L, a, b, row) {
+  const dateEl = document.getElementById("date");
+  dateEl.valueAsDate = new Date();
+
+  function setValues(who, L, a, b, pick) {
     const p = people[who];
-    p.inputs.L.value = L; p.inputs.a.value = a; p.inputs.b.value = b;
-    p.marks.forEach((m, i) => m.classList.toggle("on", i === row));
+    p.inputs.L.value = L; p.inputs.a.value = a; p.inputs.b.value = b; p.pick = pick;
   }
   document.getElementById("sample").onclick = () => {
-    setValues("female", "66.27", "8.27", "17.48", 0);
-    setValues("male", "66.81", "9.58", "15.34", 2);
+    setValues("female", "66.27", "8.27", "17.48", null);
+    setValues("male", "66.81", "9.58", "15.34", "autumn");
     update();
   };
   document.getElementById("reset").onclick = () => {
     for (const p of Object.values(people)) {
       Object.values(p.inputs).forEach((i) => (i.value = ""));
-      p.marks.forEach((m) => m.classList.remove("on"));
+      p.pick = null;
     }
+    document.getElementById("name-female").value = "";
+    document.getElementById("name-male").value = "";
+    dateEl.valueAsDate = new Date();
     update();
   };
   update();
