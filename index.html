@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>웨딩 준비 대시보드</title>
+<title>지수와 성수의 결혼준비</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -60,14 +60,13 @@
     display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
     background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 28px 32px;
   }
-  .couple { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .couple { margin: 0; display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; font: 700 28px/1.3 var(--display); }
   .couple input {
-    width: 7.5em; border: 0; border-bottom: 1px dashed var(--line); background: transparent; padding: 2px 0;
-    font: 700 26px/1.3 var(--display); color: var(--ink);
+    width: auto; min-width: 2.4em; text-align: center; color: var(--accent); border: 0; border-bottom: 1px dashed var(--line); background: transparent; padding: 2px 0;
+    font: inherit;
   }
   .couple input::placeholder { color: var(--ink-2); opacity: .55; font-weight: 400; }
   .couple input:focus { outline: none; border-bottom-color: var(--accent); }
-  .couple .amp { font: 400 22px var(--display); color: var(--accent); }
   .date-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; color: var(--ink-2); flex-wrap: wrap; }
   .date-row input[type=date] {
     border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 6px 10px; color: var(--ink);
@@ -201,7 +200,8 @@
     .dday { justify-content: space-between; }
     .dday .big { text-align: left; }
     .dday .big b { font-size: 52px; }
-    .couple input { font-size: 22px; width: 6em; }
+    .couple { font-size: 19px; gap: 2px; }
+    .couple input { padding: 2px 0; min-width: 2em; }
     .card { padding: 18px 16px; }
     .vendor-add { grid-template-columns: 1fr 1fr; }
     .vendor-add .btn { grid-column: 1 / -1; }
@@ -214,11 +214,12 @@
 
   <section class="hero">
     <div>
-      <div class="couple">
-        <input id="nameA" placeholder="신랑 이름" aria-label="신랑 이름" maxlength="12">
-        <span class="amp">&amp;</span>
-        <input id="nameB" placeholder="신부 이름" aria-label="신부 이름" maxlength="12">
-      </div>
+      <h1 class="couple">
+        <input id="nameA" placeholder="이름" aria-label="첫 번째 이름" maxlength="12" size="3">
+        <span>와</span>
+        <input id="nameB" placeholder="이름" aria-label="두 번째 이름" maxlength="12" size="3">
+        <span>의 결혼준비</span>
+      </h1>
       <div class="date-row">
         <label for="weddingDate">예식일</label>
         <input id="weddingDate" type="date">
@@ -275,8 +276,8 @@
         <p class="sub">예상 인원과 참석 확정 인원을 구분해 적어 주세요.</p>
         <div class="guest-grid">
           <span></span><span class="h">예상</span><span class="h">확정</span>
-          <label for="gAe">신랑측</label><input id="gAe" type="number" min="0" inputmode="numeric"><input id="gAc" type="number" min="0" inputmode="numeric" aria-label="신랑측 확정">
-          <label for="gBe">신부측</label><input id="gBe" type="number" min="0" inputmode="numeric"><input id="gBc" type="number" min="0" inputmode="numeric" aria-label="신부측 확정">
+          <label for="gAe" id="lblA">첫 번째</label><input id="gAe" type="number" min="0" inputmode="numeric"><input id="gAc" type="number" min="0" inputmode="numeric" aria-label="첫 번째 사람 쪽 확정">
+          <label for="gBe" id="lblB">두 번째</label><input id="gBe" type="number" min="0" inputmode="numeric"><input id="gBc" type="number" min="0" inputmode="numeric" aria-label="두 번째 사람 쪽 확정">
         </div>
         <div class="guest-sum" id="guestSum"></div>
         <div class="field-inline"><label for="unitCost">1인 식대</label><input id="unitCost" type="number" min="0" step="0.5" inputmode="decimal"><span class="unit">만원</span></div>
@@ -324,7 +325,7 @@
   function example() {
     return {
       example: true,
-      a: "", b: "",
+      a: "지수", b: "성수",
       date: exampleDate(),
       tasks: [
         task("p1", "예산 총액 정하기", true), task("p1", "양가 상견례", true), task("p1", "예식장 투어와 계약", true), task("p1", "웨딩플래너·스드메 상담"),
@@ -380,6 +381,10 @@
   function renderHero() {
     $("nameA").value = S.a || "";
     $("nameB").value = S.b || "";
+    fitNames();
+    document.title = `${S.a || "우리"}와 ${S.b || "우리"}의 결혼준비`;
+    $("lblA").textContent = S.a ? `${S.a} 쪽` : "첫 번째";
+    $("lblB").textContent = S.b ? `${S.b} 쪽` : "두 번째";
     $("weddingDate").value = S.date || "";
     const w = parseDate(S.date);
     if (!w) { $("ddayNum").textContent = "D-?"; $("ddaySub").textContent = "예식일을 정해 주세요"; $("dateLabel").textContent = ""; return; }
@@ -479,8 +484,11 @@
   const touch = () => { save(); render(); };
 
   // ---- 이벤트 ----
-  $("nameA").addEventListener("input", (e) => { S.a = e.target.value; save(); });
-  $("nameB").addEventListener("input", (e) => { S.b = e.target.value; save(); });
+  const fitNames = () => ["nameA", "nameB"].forEach((id) => { $(id).size = Math.max(3, $(id).value.length + 1); });
+  $("nameA").addEventListener("input", (e) => { S.a = e.target.value; save(); fitNames(); });
+  $("nameB").addEventListener("input", (e) => { S.b = e.target.value; save(); fitNames(); });
+  $("nameA").addEventListener("change", () => render());
+  $("nameB").addEventListener("change", () => render());
   $("weddingDate").addEventListener("change", (e) => { if (e.target.value) { S.date = e.target.value; touch(); } });
 
   document.addEventListener("change", (e) => {
