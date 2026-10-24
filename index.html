@@ -44,6 +44,7 @@
   }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     margin: 0; background: var(--bg); color: var(--ink); font: 400 14px/1.6 var(--body);
     padding: 24px max(16px, env(safe-area-inset-left, 0px)) 56px max(16px, env(safe-area-inset-right, 0px));
@@ -190,6 +191,33 @@
   .vendor-add input { min-width: 0; border: 1px dashed var(--line); background: transparent; border-radius: 10px; padding: 7px 12px; }
   .vendor-add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
 
+  /* 시트 연동 */
+  .chip-btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 3px 12px; font-size: 12.5px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
+  .chip-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .chip-btn i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-2); opacity: .5; }
+  .chip-btn[data-s="idle"] i { background: var(--ok); opacity: 1; }
+  .chip-btn[data-s="syncing"] i { background: var(--warn); opacity: 1; }
+  .chip-btn[data-s="error"] i, .chip-btn[data-s="conflict"] i { background: var(--bad); opacity: 1; }
+  .sync-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--bad-soft); color: var(--bad); border-radius: 12px; padding: 10px 16px; font-size: 13px; }
+  .sync-bar div { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sync-bar button { border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 999px; padding: 5px 14px; font-weight: 500; }
+  .sync-bar button:hover { background: var(--surface); }
+  dialog { border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink); padding: 24px 26px; width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; }
+  dialog::backdrop { background: rgba(0, 0, 0, .45); }
+  dialog h2 { margin: 0 0 6px; font: 700 20px var(--display); }
+  dialog p { margin: 0 0 12px; font-size: 13px; color: var(--ink-2); }
+  dialog ol { margin: 0 0 14px; padding-left: 20px; font-size: 13px; line-height: 1.7; }
+  dialog a { color: var(--accent); }
+  dialog code { background: var(--surface-2); border-radius: 4px; padding: 0 4px; font-size: 12px; }
+  dialog textarea { width: 100%; height: 130px; font: 11.5px/1.4 ui-monospace, Menlo, monospace; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); border-radius: 8px; padding: 8px; }
+  dialog input[type=url] { width: 100%; border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 8px 10px; color: var(--ink); }
+  dialog input[type=url]:focus { outline: none; border-color: var(--accent); }
+  dialog .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  dialog .msg { margin-top: 10px; font-size: 13px; min-height: 1.4em; }
+  dialog .msg.bad { color: var(--bad); } dialog .msg.ok { color: var(--ok); }
+  dialog details { margin-bottom: 12px; font-size: 13px; }
+  dialog summary { cursor: pointer; font-weight: 500; margin-bottom: 8px; }
+
   /* 시세 비교 */
   .area-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: -4px 0 14px; font-size: 13px; }
   .area-row select { border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 5px 8px; max-width: 100%; }
@@ -270,6 +298,7 @@
         <label for="weddingDate">예식일</label>
         <input id="weddingDate" type="date">
         <span id="dateLabel"></span>
+        <button type="button" class="chip-btn" id="syncChip" data-s="off"><i></i><span id="syncText">저장: 이 브라우저</span></button>
       </div>
     </div>
     <div class="dday">
@@ -284,6 +313,11 @@
   <div class="example-bar" id="exampleBar" hidden>
     <span>지금 보이는 숫자와 업체는 예시입니다. 예식일을 바꾸면 체크리스트 기한도 함께 바뀝니다.</span>
     <button type="button" id="clearExample">예시 지우고 시작</button>
+  </div>
+
+  <div class="sync-bar" id="syncBar" hidden>
+    <span id="syncMsg"></span>
+    <div id="syncBtns"></div>
   </div>
 
   <section class="stats" id="stats"></section>
@@ -360,6 +394,91 @@
     <button type="button" id="resetAll">처음 상태(예시)로 되돌리기</button>
   </footer>
 </div>
+
+<dialog id="syncDialog" aria-labelledby="syncTitle">
+  <h2 id="syncTitle">구글 시트에 저장하기</h2>
+  <div id="syncOff">
+    <p>두 분이 같은 데이터를 보도록 구글 시트에 저장합니다. 대시보드를 여는 사람은 구글 로그인이 필요 없고, 시트를 만드는 한 사람만 처음에 한 번 설정하면 됩니다.</p>
+    <ol>
+      <li><a href="https://sheets.new" target="_blank" rel="noopener">sheets.new</a>로 새 구글 시트를 만듭니다.</li>
+      <li>메뉴 <b>확장 프로그램 → Apps Script</b>를 열고, 기존 코드를 모두 지운 뒤 아래 코드를 붙여 넣고 저장합니다.</li>
+      <li><b>배포 → 새 배포 → 유형: 웹 앱</b>. 실행 사용자는 <b>나</b>, 액세스 권한은 <b>모든 사용자</b>로 두고 배포합니다. 처음에는 권한 승인 화면이 나오며, "확인되지 않은 앱" 경고가 뜨면 고급 → 이동을 누릅니다.</li>
+      <li>배포 후 나오는 <b>웹 앱 URL</b>(<code>…/exec</code>)을 복사해 아래에 붙여 넣습니다. 상대방도 같은 URL을 붙여 넣으면 됩니다.</li>
+    </ol>
+    <details><summary>붙여 넣을 코드 보기</summary>
+      <textarea id="gsCode" readonly></textarea>
+      <div class="row"><button class="btn" type="button" id="copyGs">코드 복사</button><span class="msg" id="copyMsg"></span></div>
+    </details>
+    <label for="syncUrl" style="font-size:13px">웹 앱 URL</label>
+    <input id="syncUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" spellcheck="false">
+    <p style="margin-top:8px">이 URL을 아는 사람은 누구나 데이터를 읽고 고칠 수 있습니다. 두 분 외에는 공유하지 마세요.</p>
+    <div class="row"><button class="btn" type="button" id="syncConnect">연결</button><button class="btn" type="button" data-close>닫기</button></div>
+  </div>
+  <div id="syncOn" hidden>
+    <p>구글 시트와 연결되어 있습니다. 고친 내용은 몇 초 안에 시트에 저장되고, 다른 기기의 변경은 30초마다 확인합니다. 시트의 <b>체크리스트·예산·하객·업체·요약</b> 탭에서 내용을 볼 수 있습니다. 시트에서 직접 고친 값은 대시보드에 반영되지 않습니다.</p>
+    <div class="row"><button class="btn" type="button" id="syncNow">지금 동기화</button><button class="btn" type="button" id="syncOffBtn">연결 끊기</button><button class="btn" type="button" data-close>닫기</button></div>
+  </div>
+  <div class="msg" id="syncDlgMsg" role="status"></div>
+</dialog>
+
+<script id="gs-code" type="text/plain">
+// 지수와 성수의 결혼준비: 구글 시트 저장용 Apps Script
+function sheet_(name) {
+  var ss = SpreadsheetApp.getActive();
+  return ss.getSheetByName(name) || ss.insertSheet(name);
+}
+function read_() {
+  var v = sheet_('_state').getRange('A1:C1').getValues()[0];
+  return { rev: Number(v[0]) || 0, at: String(v[1] || ''), state: v[2] ? JSON.parse(v[2]) : null };
+}
+function out_(o) {
+  return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
+}
+function doGet() {
+  var r = read_();
+  return out_({ ok: true, rev: r.rev, at: r.at, state: r.state });
+}
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var req = JSON.parse(e.postData.contents);
+    var cur = read_();
+    if (!req.force && Number(req.base) !== cur.rev) {
+      return out_({ ok: false, conflict: true, rev: cur.rev, at: cur.at, state: cur.state });
+    }
+    var json = JSON.stringify(req.state);
+    if (json.length > 45000) return out_({ ok: false, error: 'too_large' });
+    var rev = cur.rev + 1, at = new Date().toISOString();
+    var st = sheet_('_state');
+    st.getRange('B1:C1').setNumberFormat('@');
+    st.getRange('A1:C1').setValues([[rev, at, json]]);
+    st.hideSheet();
+    views_(req.view || {});
+    return out_({ ok: true, rev: rev, at: at });
+  } catch (err) {
+    return out_({ ok: false, error: String(err) });
+  } finally {
+    lock.releaseLock();
+  }
+}
+function views_(view) {
+  var heads = {
+    '요약': ['항목', '값'],
+    '체크리스트': ['단계', '기한', '할 일', '완료'],
+    '예산': ['묶음', '항목', '예산(만원)', '지출(만원)'],
+    '하객': ['구분', '예상', '확정'],
+    '업체': ['업체', '분류', '상태']
+  };
+  Object.keys(heads).forEach(function (name) {
+    var head = heads[name], rows = view[name] || [], sh = sheet_(name);
+    sh.clear();
+    sh.getRange(1, 1, 1, head.length).setValues([head]).setFontWeight('bold');
+    if (rows.length) sh.getRange(2, 1, rows.length, head.length).setValues(rows);
+    sh.setFrozenRows(1);
+  });
+}
+</script>
 
 <script id="market-data" type="application/json">{"areas":{"nation":{"label":"전국 평균","hall":350.0,"guarantee":200,"perGuest":6.0,"sdeme":298.0,"dress":170.0,"studio":139.0,"gift":11.7},"seoul":{"label":"서울","hall":630.0,"guarantee":200,"perGuest":8.0,"sdeme":350.0,"dress":180.0,"studio":150.0,"gift":13.4},"gyeongin":{"label":"경기·인천","hall":300.0,"guarantee":200,"perGuest":6.2,"sdeme":220.0,"dress":137.0,"studio":120.0,"gift":11.9},"metro":{"label":"광역시 (부산·대구·광주·대전·울산)","hall":250.0,"guarantee":150,"perGuest":5.3,"sdeme":280.0,"dress":180.0,"studio":140.0,"gift":12.6},"other":{"label":"그 외 지역","hall":300.0,"guarantee":200,"perGuest":5.0,"sdeme":300.0,"dress":170.0,"studio":115.0,"gift":11.7}},"optional":{"생화꽃장식":{"nation":256.0,"seoul":500.0,"gyeongin":193.0,"metro":150.0,"other":125.0},"축가/축하공연":{"nation":25.0,"seoul":30.0,"gyeongin":25.0,"metro":24.0,"other":25.0},"본식 사회자":{"nation":30.0,"seoul":33.0,"gyeongin":26.0,"metro":30.0,"other":30.0},"본식 도우미":{"nation":30.0,"seoul":30.0,"gyeongin":30.0,"metro":35.0,"other":25.0},"주례비":{"nation":16.0,"seoul":20.0,"gyeongin":17.0,"metro":15.0,"other":16.0},"폐백 음식":{"nation":30.0,"seoul":36.0,"gyeongin":34.0,"metro":17.0,"other":28.0},"폐백 수모비":{"nation":10.0,"seoul":15.0,"gyeongin":15.0,"metro":10.0,"other":10.0},"혼주 헤어/메이크업":{"nation":15.0,"seoul":17.0,"gyeongin":18.0,"metro":14.0,"other":14.0},"부케":{"nation":25.0,"seoul":29.0,"gyeongin":25.0,"metro":19.0,"other":24.0},"본식 촬영 비용":{"nation":76.0,"seoul":85.0,"gyeongin":70.0,"metro":66.0,"other":65.0},"본식 원판 구매":{"nation":50.0,"seoul":50.0,"gyeongin":51.0,"metro":50.0,"other":49.0},"플라워 샤워":{"nation":14.0,"seoul":22.0,"gyeongin":12.0,"metro":10.0,"other":10.0},"축주비":{"nation":40.0,"seoul":43.0,"gyeongin":40.0,"metro":30.0,"other":30.0},"포토테이블":{"nation":37.0,"seoul":37.0,"gyeongin":23.0,"metro":37.0,"other":37.0},"한복대여":{"nation":28.0,"seoul":33.0,"gyeongin":25.0,"metro":30.0,"other":27.0},"웨딩케이크":{"nation":38.0,"seoul":44.0,"gyeongin":20.0,"metro":30.0,"other":20.0},"본식드레스도우미":{"nation":15.0,"seoul":34.0,"gyeongin":16.0,"metro":15.0,"other":15.0},"드레스 헬퍼(촬영)":{"nation":25.0,"seoul":25.0,"gyeongin":25.0,"metro":23.0,"other":25.0},"드레스 헬퍼(본식)":{"nation":25.0,"seoul":25.0,"gyeongin":23.0,"metro":22.0,"other":25.0},"드레스 기본 피팅비":{"nation":6.0,"seoul":6.0,"gyeongin":6.0,"metro":6.0,"other":6.0},"드레스 추가 피팅비":{"nation":6.0,"seoul":6.0,"gyeongin":6.0,"metro":4.0,"other":6.0},"드레스 재가봉비":{"nation":10.0,"seoul":10.0,"gyeongin":6.0,"metro":11.0,"other":11.0},"가봉스냅":{"nation":73.0,"seoul":75.0,"gyeongin":64.0,"metro":66.0,"other":71.0},"드레스 지정비":{"nation":88.0,"seoul":83.0,"gyeongin":65.0,"metro":165.0,"other":94.0},"드레스 디자인 추가":{"nation":115.0,"seoul":88.0,"gyeongin":75.0,"metro":150.0,"other":83.0},"드레스 2부":{"nation":44.0,"seoul":50.0,"gyeongin":18.0,"metro":33.0,"other":39.0},"드레스 퍼스트웨어":{"nation":97.0,"seoul":110.0,"gyeongin":50.0,"metro":55.0,"other":139.0},"야외 예식":{"nation":15.0,"seoul":17.0,"gyeongin":25.0,"metro":15.0,"other":13.0},"턱시도 대여":{"nation":20.0,"seoul":23.0,"gyeongin":15.0,"metro":18.0,"other":15.0},"액세서리 대여":{"nation":23.0,"seoul":0.0,"gyeongin":25.0,"metro":16.0,"other":20.0}},"monthly":[{"m":"2026-04","hall":1725.0,"n":5507,"sdeme":289.0},{"m":"2026-05","hall":1740.0,"n":7448,"sdeme":289.0},{"m":"2026-06","hall":1641.0,"n":7100,"sdeme":290.0},{"m":"2026-07","hall":1400.0,"n":3468,"sdeme":290.0},{"m":"2026-08","hall":1300.0,"n":3006,"sdeme":290.0},{"m":"2026-09","hall":1600.0,"n":4384,"sdeme":292.0},{"m":"2026-10","hall":1520.0,"n":6431,"sdeme":294.0},{"m":"2026-11","hall":1500.0,"n":5710,"sdeme":300.0},{"m":"2026-12","hall":1500.0,"n":4939,"sdeme":300.0},{"m":"2027-01","hall":1400.0,"n":3179,"sdeme":300.0},{"m":"2027-02","hall":1400.0,"n":2896,"sdeme":300.0},{"m":"2027-03","hall":1580.0,"n":3933,"sdeme":300.0},{"m":"2027-04","hall":1620.0,"n":3895,"sdeme":300.0},{"m":"2027-05","hall":1575.0,"n":3372,"sdeme":300.0},{"m":"2027-06","hall":1550.0,"n":2989,"sdeme":300.0},{"m":"2027-07","hall":1418.0,"n":2030,"sdeme":300.0},{"m":"2027-08","hall":1400.0,"n":1650,"sdeme":300.0},{"m":"2027-09","hall":1575.0,"n":1922,"sdeme":300.0},{"m":"2027-10","hall":1550.0,"n":1436,"sdeme":300.0},{"m":"2027-11","hall":1650.0,"n":1092,"sdeme":300.0},{"m":"2027-12","hall":1650.0,"n":903,"sdeme":300.0}],"surveys":{"duo":{"label":"듀오 2026 (신혼부부 1,000명)","hall":1460.0,"sdeme":471.0,"gifts":588.0,"yedan":763.0,"ibaji":155.0,"honsu":1445.0,"honeymoon":1030.0,"total":5912.0,"small":895.0},"gayeon":{"label":"가연 2024 (기혼 1,000명)","hall":990.0,"sdeme":479.0,"gifts":530.0,"yedan":566.0,"honsu":2615.0,"total":6298.0}},"meal":{"코스":11.9,"뷔페":6.2,"한상차림":5.5},"season":{"peak":1580.0,"off":1418.0},"cost":{"대관료":{"lo":100.0,"hi":900.0,"basis":"중간값 350, 상위25% 600, 상위10% 900"},"기본장식비":{"lo":0.0,"hi":48.0,"basis":"평균 77"},"총 식대":{"lo":975.0,"hi":1625.0,"basis":"중간값 1,180"},"1인당 식대":{"lo":5.0,"hi":8.0,"basis":"서울 8.0 / 경인 6.2 / 광역 5.3 / 이외 5.0"},"최소보증인원":{"lo":150.0,"hi":200.0,"basis":"4대광역시 150, 그 외 200"},"스튜디오":{"lo":115.0,"hi":150.0,"basis":"중간값 139"},"드레스":{"lo":137.0,"hi":180.0,"basis":"중간값 170"},"메이크업":{"lo":null,"hi":null,"basis":"등급별 상이"},"스드메 패키지":{"lo":220.0,"hi":350.0,"basis":"중간값 298, 서울 350, 경인 220"},"드메 패키지":{"lo":137.0,"hi":180.0,"basis":"중간값 170"},"결혼반지":{"lo":100.0,"hi":400.0,"basis":"청담 다이아 1개 기준 300선 언급"},"예물 세트":{"lo":300.0,"hi":800.0,"basis":"평균 588 (듀오)"},"예단":{"lo":500.0,"hi":1500.0,"basis":"평균 763 (듀오)"},"예복":{"lo":80.0,"hi":300.0,"basis":"80~100만 언급"},"턱시도 대여":{"lo":15.0,"hi":23.0,"basis":"중간값 20"},"본식 스냅":{"lo":45.0,"hi":120.0,"basis":"45~120만 분포"},"본식 영상":{"lo":27.0,"hi":76.0,"basis":"본식 촬영 비용 중간값 76"},"가봉스냅":{"lo":64.0,"hi":75.0,"basis":"중간값 73"},"혼주 한복":{"lo":27.0,"hi":33.0,"basis":"한복대여 중간값 28~33"},"혼주 메이크업":{"lo":14.0,"hi":18.0,"basis":"중간값 15~18"},"종이 청첩장":{"lo":1.3,"hi":30.0,"basis":"1.3만(10장)~30만(224장)"},"모바일 청첩장":{"lo":0.0,"hi":1.0,"basis":"7,600원 사례"},"본식 사회자":{"lo":26.0,"hi":33.0,"basis":"중간값 30"},"주례비":{"lo":15.0,"hi":20.0,"basis":"중간값 16"},"부케":{"lo":19.0,"hi":29.0,"basis":"중간값 25"},"포토테이블":{"lo":23.0,"hi":37.0,"basis":"중간값 37"},"축주비":{"lo":30.0,"hi":43.0,"basis":"중간값 40"},"답례품":{"lo":5.0,"hi":10.0,"basis":"스몰웨딩에선 생략 가능"},"신혼여행":{"lo":600.0,"hi":1200.0,"basis":"평균 1,030 (듀오)"},"가전·가구":{"lo":1445.0,"hi":2600.0,"basis":"평균 1,445 (듀오), 2,615 (가연)"}},"extra":[{"cat":"스드메","contract":140.0,"final":200.0,"diff":60.0,"pct":42.9,"note":"박람회 견적 199만 + 예상추가금 300만 예상 → 실제 200만에 마무리. 드레스 추가금 섹션(1~20만)에서 선택. 본식 지방이라 헬퍼비+지방메이크업 추가","src":"네이버 블로그 100만원대 스드메 후기","url":"https://m.blog.naver.com/dbals0088/223802818768"},{"cat":"스드메","contract":144.0,"final":217.0,"diff":73.0,"pct":50.7,"note":"계약서에 빠진 드레스 이모 수고비는 구두로만 설명. '스드메는 100만 원으로' 요구 후 협상한 사례","src":"브런치 144만원짜리 스드메 계약서","url":"https://brunch.co.kr/@sciencetravel/158"},{"cat":"스드메","contract":82.0,"final":280.0,"diff":198.0,"pct":241.5,"note":"드레스 추가 75만은 견적서에도 없었고 구두 설명. 헬퍼비는 현금 정산이라 계약서에서 누락. '제대로 정산하면 200만원보다 훨씬 많다'","src":"머니투데이 스드메 추가금 실태","url":"https://www.mt.co.kr/society/2025/04/19/2025041416235079063"}],"support":[{"org":"구미시","metric":"소규모 예식 지원금","value":300.0,"note":"상한"},{"org":"구미시","metric":"혼인신고 청년 구미사랑상품권","value":100.0,"note":""},{"org":"서울시","metric":"공공 웨딩홀 대관료","value":0.0,"note":"서울 거주자·생활권자 무료"},{"org":"서울시","metric":"공공 웨딩홀 시설(의자·테이블) 지원금","value":100.0,"note":"상한"}],"scenarios":[{"name":"강남 일반 200명","guests":200,"total":3322.0,"notes":"식대1600+대관758+스드메387+장식226+예물의상혼주577"},{"name":"강남 일반 200명 (축의금 60% 회수)","guests":200,"total":1918.0,"notes":"지출 3,322만 - 축의금 1,404만"},{"name":"경기 일반 200명","guests":200,"total":2305.0,"notes":"식대1240+대관412+스드메256+선택443"},{"name":"경기 일반 200명 (축의금 60% 회수)","guests":200,"total":901.0,"notes":"지출 2,305만 - 축의금 1,404만"},{"name":"지방 일반 200명","guests":200,"total":1965.0,"notes":"식대1000+대관300+스드메284+선택381"},{"name":"지방 일반 200명 (축의금 60% 회수)","guests":200,"total":561.0,"notes":"지출 1,965만 - 축의금 1,404만"},{"name":"서울 스몰웨딩 50명","guests":50,"total":1476.0,"notes":"식대400+대관300+스드메300+선택476"},{"name":"서울 스몰웨딩 50명 (축의금 80% 회수)","guests":50,"total":1008.0,"notes":"지출 1,476만 - 축의금 468만"},{"name":"서울 스몰웨딩 30명","guests":30,"total":976.0,"notes":"식대240+대관250+스드메200+선택286"},{"name":"서울 스몰웨딩 30명 (축의금 85% 회수)","guests":30,"total":678.0,"notes":"지출 976만 - 축의금 298만"},{"name":"미니웨딩 7명 실제","guests":7,"total":183.6,"notes":"실제 후기: 예식126+발렛3+청첩장1.3+드레스9.8+액세서리1.6+메이크업24+스튜디오18"},{"name":"가족식 12명 실제","guests":12,"total":541.7,"notes":"실제 후기: 식대285.5+본식115+스드메62.6+혼주75.6+청첩장3"}],"sources":[{"name":"한국소비자원 참가격 지역별","url":"https://www.price.go.kr/tprice/portal/wedding/areaStatistic.do"},{"name":"한국소비자원 시기별","url":"https://www.price.go.kr/tprice/portal/wedding/areaStatisticDetailByPeriod.do"},{"name":"한국소비자원 예식장 대관료 분포","url":"https://www.price.go.kr/tprice/portal/wedding/areaStatisticDetailWH.do"},{"name":"NH농협은행 축의금 트렌드 보고서","url":"https://www.yna.co.kr/view/AKR20260513161300002"},{"name":"듀오 2026 결혼비용 실태 보고서","url":"https://www.businesskorea.co.kr/news/articleView.html?idxno=264825"},{"name":"가연 결혼비용 조사","url":"https://www.fnnews.com/news/202402271445429363"},{"name":"한국소비자원 스드메 품목별 가격","url":"https://www.price.go.kr/tprice/portal/wedding/areaStatisticDetailSDM.do"},{"name":"머니투데이 스드메 추가금 실태","url":"https://www.mt.co.kr/society/2025/04/19/2025041416235079063"}],"collected":"2026-10-24"}</script>
 <script>
@@ -442,7 +561,9 @@
   let S;
   try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
   if (!S || !Array.isArray(S.tasks)) S = example();
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+  let onSaved = () => {};
+  const writeLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+  const save = () => { writeLocal(); onSaved(); };
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -776,6 +897,125 @@
     if (M) S.guests.unit = M.areas[AREA()].perGuest;
     touch();
   });
+
+  // ---- 구글 시트 동기화 ----
+  const SYNC_KEY = "wedding-sheet-sync-v1";
+  const URL_RE = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/;
+  let SY = {};
+  try { SY = JSON.parse(localStorage.getItem(SYNC_KEY)) || {}; } catch (e) { SY = {}; }
+  const saveSY = () => { try { localStorage.setItem(SYNC_KEY, JSON.stringify(SY)); } catch (e) {} };
+  let syncStatus = SY.url ? "idle" : "off", conflict = null, lastAt = "", busy = false, seq = 0, pushTimer = null;
+  const hhmm = (d) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+
+  async function call(body, q) {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 20000);
+    try {
+      // 헤더를 지정하지 않아 text/plain 으로 보내야 구글 서버가 CORS 사전 요청 없이 받는다
+      const r = await fetch(SY.url + (q || ""), body ? { method: "POST", body: JSON.stringify(body), signal: ctl.signal } : { signal: ctl.signal });
+      return await r.json();
+    } finally { clearTimeout(t); }
+  }
+  function viewOf() {
+    const sum = (k) => S.budget.reduce((a, b) => a + b[k], 0), g = S.guests;
+    const done = S.tasks.filter((t) => t.done).length, n = S.a ? `${S.a} 쪽` : "첫 번째", m = S.b ? `${S.b} 쪽` : "두 번째";
+    const w = parseDate(S.date), dd = w ? daysUntil(w) : null;
+    return {
+      "요약": [["예식일", S.date], ["D-day", dd === null ? "" : dd > 0 ? `D-${dd}` : dd === 0 ? "D-Day" : `D+${-dd}`],
+        ["체크리스트", `${done} / ${S.tasks.length}`], ["예산 합계(만원)", sum("plan")], ["지출 합계(만원)", sum("spent")], ["예상 축의금(만원)", giftEstimate()]],
+      "체크리스트": PHASES.flatMap((p) => { const d = dueDate(p.id); return S.tasks.filter((t) => t.phase === p.id).map((t) => [p.label, d ? fmtMD(d) : "", t.t, t.done ? "✓" : ""]); }),
+      "예산": GROUPS.flatMap((gr) => S.budget.filter((b) => (b.g || "기타") === gr).map((b) => [gr, b.name, b.plan, b.spent])).concat([["합계", "", sum("plan"), sum("spent")]]),
+      "하객": [[n, g.ae, g.ac], [m, g.be, g.bc], ["합계", g.ae + g.be, g.ac + g.bc], ["1인 식대(만원)", g.unit, ""]],
+      "업체": S.vendors.map((v) => [v.name, v.cat || "", STATUS[v.st]]),
+    };
+  }
+  function setStatus(s) { syncStatus = s; renderSync(); }
+  function renderSync() {
+    const chip = $("syncChip");
+    chip.dataset.s = syncStatus;
+    $("syncText").textContent = { off: "저장: 이 브라우저", idle: `구글 시트 연동${lastAt ? " · " + lastAt + " 저장됨" : ""}`, syncing: "시트에 저장 중…", error: "시트 연결 실패 · 눌러서 확인", conflict: "확인이 필요해요" }[syncStatus];
+    const bar = $("syncBar");
+    bar.hidden = syncStatus !== "conflict";
+    if (syncStatus === "conflict" && conflict) {
+      const first = !SY.rev;
+      $("syncMsg").textContent = first ? "시트에 이미 저장된 데이터가 있어요. 어느 쪽을 쓸까요?" : "다른 기기에서 먼저 고친 내용이 있어요. 어느 쪽을 쓸까요?";
+      $("syncBtns").innerHTML = '<button type="button" data-sy="theirs">시트 내용 불러오기</button><button type="button" data-sy="mine">내 내용으로 덮어쓰기</button>';
+    }
+    $("syncOff").hidden = !!SY.url; $("syncOn").hidden = !SY.url;
+  }
+  function applyRemote(res) {
+    const st = res.state;
+    if (!st || !Array.isArray(st.tasks) || !Array.isArray(st.budget)) { setStatus("error"); return; }
+    S = st; if (!S.guests) S.guests = { ae: 0, ac: 0, be: 0, bc: 0, unit: 0 };
+    writeLocal(); SY.rev = res.rev; SY.dirty = false; saveSY();
+    conflict = null; lastAt = res.at ? hhmm(new Date(res.at)) : "";
+    render(); setStatus("idle");
+  }
+  async function push(force) {
+    if (!SY.url || busy) return;
+    busy = true; setStatus("syncing");
+    const mySeq = seq;
+    try {
+      const res = await call({ base: SY.rev || 0, force: !!force, state: S, view: viewOf() });
+      if (res.ok) {
+        SY.rev = res.rev; SY.dirty = seq !== mySeq; saveSY();
+        conflict = null; lastAt = hhmm(new Date(res.at)); setStatus("idle");
+        if (SY.dirty) schedulePush();
+      } else if (res.conflict) { conflict = res; setStatus("conflict"); }
+      else throw new Error(res.error || "save failed");
+    } catch (e) { setStatus("error"); schedulePush(15000); }
+    finally { busy = false; }
+  }
+  function schedulePush(ms) { clearTimeout(pushTimer); pushTimer = setTimeout(() => push(false), ms || 1500); }
+  async function pull() {
+    if (!SY.url || busy) return;
+    busy = true; setStatus("syncing");
+    let res;
+    try { res = await call(null, "?action=get&t=" + Date.now()); if (!res.ok) throw new Error(res.error); }
+    catch (e) { busy = false; setStatus("error"); return; }
+    busy = false;
+    if (!res.state) { SY.rev = res.rev || 0; return push(false); }       // 빈 시트: 내 데이터를 올린다
+    if (res.rev > (SY.rev || 0)) {
+      if (SY.dirty) { conflict = res; setStatus("conflict"); } else applyRemote(res);
+    } else { lastAt = lastAt || (res.at ? hhmm(new Date(res.at)) : ""); setStatus("idle"); if (SY.dirty) schedulePush(); }
+  }
+  onSaved = () => { if (SY.url) { seq++; SY.dirty = true; saveSY(); if (syncStatus !== "conflict") schedulePush(); } };
+
+  const dlg = $("syncDialog"), dmsg = (t, c) => { const m = $("syncDlgMsg"); m.textContent = t; m.className = "msg " + (c || ""); };
+  $("gsCode").value = document.getElementById("gs-code").textContent.trim();
+  $("syncChip").addEventListener("click", () => {
+    if (syncStatus === "conflict") { $("syncBar").scrollIntoView({ block: "center" }); return; }
+    dmsg(""); $("syncUrl").value = ""; renderSync();
+    if (syncStatus === "error") pull();
+    dlg.showModal();
+  });
+  dlg.addEventListener("click", (e) => { if (e.target === dlg || e.target.closest("[data-close]")) dlg.close(); });
+  $("copyGs").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText($("gsCode").value); $("copyMsg").textContent = "복사했어요"; }
+    catch (e) { $("gsCode").select(); $("copyMsg").textContent = "선택했어요. 직접 복사해 주세요."; }
+  });
+  $("syncConnect").addEventListener("click", async () => {
+    const u = $("syncUrl").value.trim();
+    if (!URL_RE.test(u)) { dmsg("웹 앱 URL이 맞는지 확인해 주세요. https://script.google.com/macros/s/…/exec 형태입니다.", "bad"); return; }
+    dmsg("연결을 확인하는 중…");
+    SY = { url: u, rev: 0, dirty: true }; saveSY();
+    try {
+      const res = await call(null, "?action=get&t=" + Date.now());
+      if (!res.ok) throw new Error("bad response");
+    } catch (e) { SY = {}; saveSY(); setStatus("off"); dmsg("연결하지 못했어요. 배포의 액세스 권한이 '모든 사용자'인지, 주소가 /exec 로 끝나는지 확인해 주세요.", "bad"); return; }
+    dlg.close(); await pull();
+  });
+  $("syncNow").addEventListener("click", async () => { dmsg(""); if (SY.dirty) await push(false); await pull(); dmsg(syncStatus === "idle" ? "동기화했어요." : "", "ok"); });
+  $("syncOffBtn").addEventListener("click", () => { SY = {}; saveSY(); conflict = null; lastAt = ""; clearTimeout(pushTimer); setStatus("off"); dlg.close(); });
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-sy]");
+    if (!b || !conflict) return;
+    if (b.dataset.sy === "theirs") applyRemote(conflict);
+    else { SY.rev = conflict.rev; conflict = null; push(true); }
+  });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) pull(); });
+  setInterval(() => { if (!document.hidden && syncStatus !== "conflict") pull(); }, 30000);
+  renderSync();
+  if (SY.url) pull();
 
   $("budgetGroup").innerHTML = GROUPS.map((g) => `<option>${g}</option>`).join("");
   $("budgetGroup").value = "기타";
