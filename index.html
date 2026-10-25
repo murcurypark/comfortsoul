@@ -2,398 +2,385 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>지수와 성수의 결혼준비</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* 레이아웃: 상단 D-day 히어로 → 요약 4칸 → 좌(체크리스트) / 우(예산·하객·업체) 2단, 모바일은 1단 */
+  /* 레이아웃: 태블릿을 기준으로 설계.
+     폰(~599px): 아래 탭 바 + 한 열 / 태블릿 세로(600~899px): 위쪽 탭 + 한 열(넓게) / 태블릿 가로·큰 화면(900px~): 왼쪽 사이드바 + 2~3열 */
   :root {
-    --bg: #f5f6f4;
+    --bg: #f4f5f3;
     --surface: #ffffff;
-    --surface-2: #eef0ed;
-    --ink: #1f2a2e;
-    --ink-2: #5d6b70;
-    --line: #dfe3e0;
-    --accent: #b84a68;
-    --accent-soft: #f6e3e8;
-    --ok: #3f7d5f;
-    --ok-soft: #e0efe7;
-    --warn: #a9701a;
-    --warn-soft: #f8ecd2;
-    --bad: #b3402f;
-    --bad-soft: #f7dfdb;
+    --surface-2: #eceeea;
+    --ink: #1b2528;
+    --ink-2: #4f5d62;
+    --line: #d9ddd9;
+    --accent: #b0405f;
+    --accent-soft: #f6e1e7;
+    --ok: #2f7554;
+    --ok-soft: #dcefe5;
+    --warn: #96600f;
+    --warn-soft: #f8ecd0;
+    --bad: #aa3a29;
+    --bad-soft: #f7ddd8;
     --display: "Gowun Batang", "Noto Serif KR", serif;
     --body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --nav-h: 68px;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #151a1c; --surface: #1e2527; --surface-2: #262e31; --ink: #e8eceb; --ink-2: #9aa7aa; --line: #323c3f;
-      --accent: #e0829b; --accent-soft: #3a2830; --ok: #6fbf97; --ok-soft: #213a2e;
-      --warn: #e0b25a; --warn-soft: #3b3220; --bad: #e8806e; --bad-soft: #3d2723;
+      --bg: #141a1c; --surface: #1e2628; --surface-2: #283133; --ink: #eef2f1; --ink-2: #a9b6b9; --line: #354042;
+      --accent: #ee8fa8; --accent-soft: #3b2931; --ok: #78c9a1; --ok-soft: #213b2f;
+      --warn: #e6bb68; --warn-soft: #3b3220; --bad: #ef8d7b; --bad-soft: #3e2824;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #151a1c; --surface: #1e2527; --surface-2: #262e31; --ink: #e8eceb; --ink-2: #9aa7aa; --line: #323c3f;
-    --accent: #e0829b; --accent-soft: #3a2830; --ok: #6fbf97; --ok-soft: #213a2e;
-    --warn: #e0b25a; --warn-soft: #3b3220; --bad: #e8806e; --bad-soft: #3d2723;
+    --bg: #141a1c; --surface: #1e2628; --surface-2: #283133; --ink: #eef2f1; --ink-2: #a9b6b9; --line: #354042;
+    --accent: #ee8fa8; --accent-soft: #3b2931; --ok: #78c9a1; --ok-soft: #213b2f;
+    --warn: #e6bb68; --warn-soft: #3b3220; --bad: #ef8d7b; --bad-soft: #3e2824;
     color-scheme: dark;
   }
 
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
-  body {
-    margin: 0; background: var(--bg); color: var(--ink); font: 400 14px/1.6 var(--body);
-    padding: 24px max(16px, env(safe-area-inset-left, 0px)) 56px max(16px, env(safe-area-inset-right, 0px));
-    -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-  button, input, select { font: inherit; color: inherit; }
-  button { cursor: pointer; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.6 var(--body); -webkit-font-smoothing: antialiased; touch-action: manipulation; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   .num { font-variant-numeric: tabular-nums; }
+  svg { display: block; }
 
-  /* ---------- hero ---------- */
-  .hero {
-    display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 28px 32px;
-  }
-  .couple { margin: 0; display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; font: 700 28px/1.3 var(--display); }
-  .couple input {
-    width: auto; min-width: 2.4em; text-align: center; color: var(--accent); border: 0; border-bottom: 1px dashed var(--line); background: transparent; padding: 2px 0;
-    font: inherit;
-  }
-  .couple input::placeholder { color: var(--ink-2); opacity: .55; font-weight: 400; }
+  /* ---------- 앱 틀 ---------- */
+  .app { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "top" "main"; min-height: 100dvh; padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+  .main { grid-area: main; min-width: 0; width: 100%; max-width: 1480px; margin: 0 auto; padding: 16px 16px calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 32px); display: flex; flex-direction: column; gap: 16px; }
+
+  /* ---------- 상단 ---------- */
+  .top { grid-area: top; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "c c" "d d" "m m"; gap: 6px 12px; align-items: center; background: var(--surface); border-bottom: 1px solid var(--line); padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 12px; }
+  .couple { grid-area: c; margin: 0; display: flex; align-items: baseline; gap: 2px; flex-wrap: wrap; font: 700 24px/1.35 var(--display); }
+  .couple input { width: auto; min-width: 2.2em; border: 0; border-bottom: 2px dashed var(--line); background: transparent; padding: 0; text-align: center; font: inherit; color: var(--accent); border-radius: 0; }
   .couple input:focus { outline: none; border-bottom-color: var(--accent); }
-  .date-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; color: var(--ink-2); flex-wrap: wrap; }
-  .date-row input[type=date] {
-    border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 6px 10px; color: var(--ink);
-  }
-  .dday { display: flex; align-items: center; gap: 22px; }
-  .dday .big { text-align: right; }
-  .dday .big small { display: block; font-size: 12px; color: var(--ink-2); letter-spacing: .08em; }
-  .dday .big b { display: block; font: 700 64px/1 var(--display); color: var(--accent); }
-  .dday .big span { font-size: 13px; color: var(--ink-2); }
-  .ring { position: relative; width: 96px; height: 96px; flex: none; }
+  .couple input::placeholder { color: var(--ink-2); opacity: .6; font-weight: 400; }
+  .meta { grid-area: m; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; }
+  #dateLabel { display: none; }
+  .chip-btn { white-space: nowrap; }
+  .date-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 15px; color: var(--ink-2); }
+  .date-row input[type=date] { min-height: 44px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 4px 10px; }
+  .dd { grid-area: d; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .dd .big { text-align: left; line-height: 1.15; }
+  .dd .big small { display: block; font-size: 14px; letter-spacing: .08em; color: var(--ink-2); }
+  .dd .big b { display: block; font: 700 46px/1.05 var(--display); color: var(--accent); }
+  .dd .big span { display: block; font-size: 14px; color: var(--ink-2); }
+  .ring { position: relative; width: 64px; height: 64px; flex: none; }
   .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .ring .t { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; line-height: 1.2; }
-  .ring .t b { font: 700 20px var(--display); display: block; }
-  .ring .t small { font-size: 10.5px; color: var(--ink-2); }
-
-  .example-bar {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-    background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 10px 16px; font-size: 13px;
-  }
-  .example-bar button {
-    border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 999px; padding: 5px 14px; font-weight: 500;
-  }
-  .example-bar button:hover { background: var(--surface); }
-
-  /* ---------- summary ---------- */
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; min-width: 0; }
-  .stat .k { font-size: 12px; color: var(--ink-2); letter-spacing: .04em; }
-  .stat .v { margin-top: 4px; font: 700 26px/1.2 var(--display); }
-  .stat .v small { font: 400 13px var(--body); color: var(--ink-2); margin-left: 4px; }
-  .meter { height: 6px; border-radius: 99px; background: var(--surface-2); margin-top: 10px; overflow: hidden; }
-  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .4s; }
-  .meter i.ok { background: var(--ok); }
-  .meter i.bad { background: var(--bad); }
-
-  /* ---------- layout ---------- */
-  .cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-  .col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; }
-  .card > h2 { margin: 0 0 4px; font: 700 20px/1.3 var(--display); display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-  .card > h2 small { font: 400 12.5px var(--body); color: var(--ink-2); }
-  .card .sub { margin: 0 0 16px; font-size: 12.5px; color: var(--ink-2); }
-
-  /* next up */
-  .next { display: flex; flex-direction: column; gap: 8px; }
-  .next-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
-  .next-item .d { flex: none; min-width: 58px; text-align: center; font: 700 13px var(--body); padding: 3px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
-  .next-item .d.late { background: var(--bad-soft); color: var(--bad); }
-  .next-item span { min-width: 0; overflow-wrap: anywhere; }
-  .empty { padding: 14px; text-align: center; color: var(--ink-2); font-size: 13px; }
-
-  /* checklist */
-  .phase + .phase { margin-top: 18px; }
-  .phase-h { display: flex; align-items: center; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
-  .phase-h b { font: 700 15px var(--body); }
-  .phase-h .due { font-size: 12px; color: var(--ink-2); }
-  .phase-h .cnt { margin-left: auto; font-size: 12px; color: var(--ink-2); }
-  .badge { font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 99px; }
-  .badge.ok { background: var(--ok-soft); color: var(--ok); }
-  .badge.late { background: var(--bad-soft); color: var(--bad); }
-  .tasks { list-style: none; margin: 0; padding: 0; }
-  .task { display: flex; align-items: flex-start; gap: 10px; padding: 9px 2px; border-bottom: 1px solid var(--surface-2); }
-  .task label { flex: 1; min-width: 0; display: flex; gap: 10px; align-items: flex-start; cursor: pointer; overflow-wrap: anywhere; }
-  .task input[type=checkbox] { appearance: none; flex: none; width: 20px; height: 20px; margin: 1px 0 0; border: 1.5px solid var(--ink-2); border-radius: 6px; background: var(--surface); display: grid; place-content: center; cursor: pointer; }
-  .task input[type=checkbox]:checked { background: var(--ok); border-color: var(--ok); }
-  .task input[type=checkbox]:checked::after { content: ""; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: translateY(-1px) rotate(45deg); }
-  .task.done label span { color: var(--ink-2); text-decoration: line-through; }
-  .x { flex: none; border: 0; background: transparent; color: var(--ink-2); width: 26px; height: 26px; border-radius: 8px; font-size: 16px; line-height: 1; opacity: .55; }
-  .x:hover { opacity: 1; background: var(--surface-2); color: var(--bad); }
-  .add { display: flex; gap: 8px; margin-top: 10px; }
-  .add input { flex: 1; min-width: 0; border: 1px dashed var(--line); background: transparent; border-radius: 10px; padding: 7px 12px; }
-  .add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
-  .btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 7px 14px; font-weight: 500; }
-  .btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* budget */
-  .table-scroll { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; font: 500 11.5px var(--body); letter-spacing: .06em; color: var(--ink-2); padding: 0 6px 8px; }
-  th.r, td.r { text-align: right; }
-  td { padding: 8px 6px; border-top: 1px solid var(--surface-2); vertical-align: middle; }
-  td .nm { font-weight: 500; overflow-wrap: anywhere; }
-  td input[type=number] {
-    width: 72px; text-align: right; border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 5px 8px; font-variant-numeric: tabular-nums;
-  }
-  td input[type=number]:focus { outline: none; border-color: var(--accent); background: var(--surface); }
-  .bar { height: 6px; border-radius: 99px; background: var(--surface-2); margin-top: 6px; overflow: hidden; min-width: 80px; }
-  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
-  .bar i.bad { background: var(--bad); }
-  .over { font-size: 11px; color: var(--bad); }
-  tr.grp td { background: var(--surface-2); font: 700 12.5px var(--body); padding: 6px 8px; border-top: 0; letter-spacing: .02em; }
-  tr.grp td:first-child { border-radius: 8px 0 0 8px; } tr.grp td:last-child { border-radius: 0 8px 8px 0; }
-  .add select { border: 1px dashed var(--line); background: transparent; border-radius: 10px; padding: 7px 8px; max-width: 8em; }
-  tfoot td { border-top: 2px solid var(--line); font-weight: 700; }
-  .unit { font-size: 11.5px; color: var(--ink-2); }
-
-  /* guests */
-  .guest-grid { display: grid; grid-template-columns: auto 1fr 1fr; gap: 8px 12px; align-items: center; }
-  .guest-grid .h { font-size: 11.5px; color: var(--ink-2); letter-spacing: .04em; }
-  .guest-grid input, .field-inline input {
-    width: 100%; text-align: right; border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 6px 10px; font-variant-numeric: tabular-nums;
-  }
-  .guest-grid input:focus, .field-inline input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
-  .guest-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
-  .guest-sum div { background: var(--surface-2); border-radius: 12px; padding: 10px 14px; }
-  .guest-sum small { display: block; font-size: 11.5px; color: var(--ink-2); }
-  .guest-sum b { font: 700 19px var(--display); }
-  .field-inline { display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 13px; }
-  .field-inline input { width: 90px; }
-
-  /* vendors */
-  .vendor { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--surface-2); }
-  .vendor:first-child { border-top: 0; }
-  .vendor .nm { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-  .vendor .nm b { font-weight: 500; }
-  .vendor .nm small { display: block; color: var(--ink-2); font-size: 12px; }
-  .vendor select { border: 1px solid transparent; border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 500; appearance: none; text-align: center; background: var(--surface-2); cursor: pointer; }
-  .vendor select[data-st="contract"] { background: var(--ok-soft); color: var(--ok); }
-  .vendor select[data-st="talking"] { background: var(--warn-soft); color: var(--warn); }
-  .vendor-add { display: grid; grid-template-columns: 1fr 90px auto; gap: 8px; margin-top: 12px; }
-  .vendor-add input { min-width: 0; border: 1px dashed var(--line); background: transparent; border-radius: 10px; padding: 7px 12px; }
-  .vendor-add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
-
-  /* 시트 연동 */
-  .chip-btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 3px 12px; font-size: 12.5px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
-  .chip-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .chip-btn i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-2); opacity: .5; }
+  .ring .t { position: absolute; inset: 0; display: grid; place-items: center; font: 700 17px var(--display); }
+  .chip-btn { min-height: 44px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 0 16px; font-size: 15px; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; }
+  .chip-btn:hover { border-color: var(--accent); }
+  .chip-btn i { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-2); opacity: .55; flex: none; }
   .chip-btn[data-s="idle"] i { background: var(--ok); opacity: 1; }
   .chip-btn[data-s="syncing"] i, .chip-btn[data-s="offline"] i { background: var(--warn); opacity: 1; }
   .chip-btn[data-s="error"] i, .chip-btn[data-s="conflict"] i { background: var(--bad); opacity: 1; }
-  .sync-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--bad-soft); color: var(--bad); border-radius: 12px; padding: 10px 16px; font-size: 13px; }
-  .sync-bar div { display: flex; gap: 8px; flex-wrap: wrap; }
-  .sync-bar button { border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 999px; padding: 5px 14px; font-weight: 500; }
-  .sync-bar button:hover { background: var(--surface); }
-  dialog { border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: var(--ink); padding: 24px 26px; width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; }
-  dialog::backdrop { background: rgba(0, 0, 0, .45); }
-  dialog h2 { margin: 0 0 6px; font: 700 20px var(--display); }
-  dialog p { margin: 0 0 12px; font-size: 13px; color: var(--ink-2); }
-  dialog ol { margin: 0 0 14px; padding-left: 20px; font-size: 13px; line-height: 1.7; }
-  dialog a { color: var(--accent); }
-  dialog code { background: var(--surface-2); border-radius: 4px; padding: 0 4px; font-size: 12px; }
-  dialog textarea { width: 100%; height: 130px; font: 11.5px/1.4 ui-monospace, Menlo, monospace; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); border-radius: 8px; padding: 8px; }
-  dialog input[type=url] { width: 100%; border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 8px 10px; color: var(--ink); }
-  dialog input[type=url]:focus { outline: none; border-color: var(--accent); }
-  dialog .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  dialog .msg { margin-top: 10px; font-size: 13px; min-height: 1.4em; }
-  dialog .msg.bad { color: var(--bad); } dialog .msg.ok { color: var(--ok); }
-  dialog details { margin-bottom: 12px; font-size: 13px; }
-  dialog summary { cursor: pointer; font-weight: 500; margin-bottom: 8px; }
 
-  /* 시세 비교 */
-  .area-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: -4px 0 14px; font-size: 13px; }
-  .area-row select { border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 5px 8px; max-width: 100%; }
-  .area-row .btn { padding: 5px 12px; font-size: 12.5px; }
-  .ref { font-size: 11.5px; color: var(--ink-2); margin-top: 3px; }
-  .ref .tag { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 99px; font-weight: 500; font-size: 10.5px; }
+  /* ---------- 탭 ---------- */
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: var(--surface); border-top: 1px solid var(--line); padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+  .tab { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: var(--nav-h); border: 0; background: transparent; color: var(--ink-2); font: 600 14px/1.2 var(--body); padding: 8px 2px; }
+  .tab svg { width: 26px; height: 26px; }
+  .tab[aria-current="page"] { color: var(--accent); }
+  .tab[aria-current="page"]::before { content: ""; position: absolute; top: 0; left: 22%; right: 22%; height: 3px; border-radius: 0 0 3px 3px; background: var(--accent); }
+  .bdg { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--bad); color: #fff; font: 700 14px/22px var(--body); text-align: center; }
+  .tab .bdg { position: absolute; top: 4px; left: calc(50% + 6px); }
+
+  /* ---------- 공통 부품 ---------- */
+  .bar-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-radius: 14px; padding: 12px 16px; font-size: 15px; }
+  .bar-note.warn { background: var(--warn-soft); color: var(--warn); }
+  .bar-note.bad { background: var(--bad-soft); color: var(--bad); }
+  .bar-note > div { display: flex; gap: 8px; flex-wrap: wrap; }
+  .bar-note button { min-height: 44px; border: 1.5px solid currentColor; background: transparent; color: inherit; border-radius: 999px; padding: 0 18px; font-weight: 600; }
+  .bar-note button:hover { background: var(--surface); }
+  .card { container: card / inline-size; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; min-width: 0; }
+  .card > h2 { margin: 0 0 4px; font: 700 21px/1.3 var(--display); display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .card > h2 small { font: 400 15px var(--body); color: var(--ink-2); }
+  .card .sub { margin: 0 0 14px; font-size: 15px; color: var(--ink-2); }
+  .panel { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .empty { padding: 16px; text-align: center; color: var(--ink-2); font-size: 15px; }
+  .btn { min-height: 48px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 0 18px; font-weight: 600; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .meter { height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .3s; }
+  .meter i.ok { background: var(--ok); } .meter i.bad { background: var(--bad); }
+  .badge { font-size: 14px; font-weight: 600; padding: 2px 10px; border-radius: 99px; white-space: nowrap; }
+  .badge.ok { background: var(--ok-soft); color: var(--ok); }
+  .badge.late { background: var(--bad-soft); color: var(--bad); }
+  .x { flex: none; width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink-2); font-size: 26px; line-height: 1; border-radius: 12px; }
+  .x:hover { background: var(--bad-soft); color: var(--bad); }
+  .tx { display: block; min-width: 0; padding: 10px 6px; border-radius: 10px; overflow-wrap: anywhere; cursor: text; }
+  .tx:hover { background: var(--surface-2); }
+  .tx.sm { font-size: 14px; color: var(--ink-2); padding-top: 0; }
+  .ed-input { width: 100%; min-height: 44px; border: 2px solid var(--accent); border-radius: 10px; padding: 4px 10px; background: var(--surface); }
+  .ed-input:focus { outline: none; }
+  .add { display: flex; gap: 8px; margin-top: 12px; }
+  .add input, .add select { flex: 1; min-width: 0; min-height: 48px; border: 1.5px dashed var(--line); background: transparent; border-radius: 12px; padding: 0 14px; }
+  .add select { flex: 0 1 8.5em; border-style: solid; background: var(--surface-2); }
+  .add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
+  .add .btn { flex: none; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chips button { min-height: 44px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 0 16px; font-weight: 600; font-size: 15px; }
+  .chips button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  input[type=number], input[type=text], input[type=date], input[type=url], select, textarea { font-size: 16px; }
+  .chev { width: 22px; height: 22px; flex: none; transition: transform .15s; color: var(--ink-2); }
+  [aria-expanded="true"] > .chev, [aria-expanded="true"] .chev { transform: rotate(90deg); }
+
+  /* ---------- 요약 타일 ---------- */
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .stat { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 16px; padding: 14px 16px; min-height: 100px; }
+  .stat:hover { border-color: var(--accent); }
+  .stat .k { font-size: 15px; color: var(--ink-2); }
+  .stat .v { margin: 2px 0 8px; font: 700 28px/1.2 var(--display); }
+  .stat .v small { font: 400 15px var(--body); color: var(--ink-2); margin-left: 4px; }
+
+  /* ---------- 화면 배치 ---------- */
+  .ov-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  .two { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .sticky { position: static; }
+
+  /* ---------- 할 일 ---------- */
+  .phase + .phase { margin-top: 6px; }
+  .ph { width: 100%; min-height: 56px; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 4px 10px; text-align: left; border: 0; background: transparent; padding: 6px 4px; border-radius: 12px; }
+  .ph:hover { background: var(--surface-2); }
+  .ph .t1 { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; min-width: 0; }
+  .ph b { font-size: 17px; }
+  .ph .due { font-size: 15px; color: var(--ink-2); }
+  .ph .cnt { font-size: 15px; font-weight: 600; color: var(--ink-2); }
+  .phase .meter { margin: 0 4px 4px 36px; height: 6px; }
+  .tasks { list-style: none; margin: 4px 0 0; padding: 0; }
+  .task { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; min-height: 52px; border-top: 1px solid var(--surface-2); }
+  .task.nx { grid-template-columns: 44px minmax(0, 1fr); }
+  .task.done .tx { color: var(--ink-2); text-decoration: line-through; }
+  .task .when { display: inline-block; margin-right: 8px; padding: 1px 10px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-size: 14px; font-weight: 700; vertical-align: 1px; }
+  .task .when.late { background: var(--bad-soft); color: var(--bad); }
+  .ck { display: grid; place-items: center; width: 44px; height: 44px; cursor: pointer; }
+  .ck input { appearance: none; -webkit-appearance: none; width: 28px; height: 28px; margin: 0; border: 2px solid var(--ink-2); border-radius: 8px; background: var(--surface); display: grid; place-content: center; cursor: pointer; }
+  .ck input:checked { background: var(--ok); border-color: var(--ok); }
+  .ck input:checked::after { content: ""; width: 7px; height: 13px; border: solid #fff; border-width: 0 3px 3px 0; transform: translateY(-1px) rotate(45deg); }
+
+  /* ---------- 예산 ---------- */
+  .area-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; font-size: 15px; }
+  .area-row select { min-height: 44px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 0 10px; max-width: 100%; }
+  .gh { width: 100%; min-height: 56px; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 10px; text-align: left; border: 0; background: var(--surface-2); border-radius: 12px; padding: 6px 12px; margin-top: 10px; }
+  .gh b { font-size: 17px; }
+  .gh .gs { font-size: 15px; font-weight: 600; }
+  .gh .gs small { color: var(--ink-2); font-weight: 400; font-size: 14px; }
+  .bi { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px; gap: 4px 10px; align-items: end; padding: 12px 2px 12px; border-top: 1px solid var(--surface-2); }
+  .bi .nm { grid-column: 1 / -1; }
+  .bi .fld { display: flex; flex-direction: column; gap: 2px; font-size: 14px; color: var(--ink-2); min-width: 0; }
+  .bi .fld input { width: 100%; min-height: 48px; text-align: right; border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 0 12px; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .bi .fld input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .bi .x { align-self: end; }
+  .bi .bar { grid-column: 1 / -1; height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin-top: 6px; }
+  .bi .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+  .bi .bar i.bad { background: var(--bad); }
+  .ref { font-size: 14px; color: var(--ink-2); padding: 0 6px; }
+  .ref .tag { display: inline-block; margin-left: 6px; padding: 0 8px; border-radius: 99px; font-weight: 600; font-size: 14px; }
   .ref .tag.hi { background: var(--warn-soft); color: var(--warn); }
   .ref .tag.lo { background: var(--accent-soft); color: var(--accent); }
-  tfoot tr.net td { border-top: 0; font-weight: 400; color: var(--ink-2); font-size: 12.5px; padding-top: 2px; }
-  tfoot tr.net td b { color: var(--ink); }
+  .over { font-size: 14px; color: var(--bad); padding: 0 6px; }
+  .tot { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: var(--surface-2); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+  .tot div small { display: block; font-size: 14px; color: var(--ink-2); }
+  .tot div b { font: 700 22px/1.3 var(--display); }
+  .tot .net b { color: var(--accent); }
+  .sumbar { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 10px); z-index: 10; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: 0 6px 24px rgba(0, 0, 0, .14); padding: 8px 12px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 8px; }
+  .sumbar div small { display: block; font-size: 14px; color: var(--ink-2); line-height: 1.3; }
+  .sumbar div b { font: 700 17px/1.3 var(--display); white-space: nowrap; }
+  .sumbar .net b { color: var(--accent); }
+  @container card (min-width: 540px) {
+    .bi { grid-template-columns: minmax(0, 1fr) 128px 128px 44px; align-items: center; gap: 4px 12px; }
+    .bi .nm { grid-column: auto; }
+    .bi .fld { flex-direction: row; align-items: center; gap: 8px; }
+    .bi .fld span { display: none; }
+    .bi .x { align-self: center; }
+  }
+  @container card (min-width: 700px) { .tot { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-  .market { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-  .mk { border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; min-width: 0; }
-  .mk.wide { grid-column: span 2; }
-  .mk h3 { margin: 0 0 10px; font: 700 15px var(--body); }
-  .mk h3 small { font-weight: 400; color: var(--ink-2); font-size: 11.5px; margin-left: 6px; }
-  .kv { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--surface-2); font-size: 13px; }
-  .kv:first-of-type { border-top: 0; }
+  /* ---------- 하객·업체 ---------- */
+  .gg { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, 1fr); gap: 8px 12px; align-items: center; }
+  .gg .h2 { font-size: 15px; color: var(--ink-2); text-align: right; }
+  .gg label { font-weight: 600; min-width: 4em; }
+  .gg input, .unit-row input { width: 100%; min-height: 52px; text-align: right; border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 10px; padding: 0 12px; font-variant-numeric: tabular-nums; font-size: 18px; }
+  .gg input:focus, .unit-row input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .sum2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .sum2 > div { background: var(--surface-2); border-radius: 12px; padding: 10px 14px; }
+  .sum2 > div.full { grid-column: 1 / -1; }
+  .sum2 small { display: block; font-size: 14px; color: var(--ink-2); line-height: 1.35; }
+  .sum2 b { font: 700 21px/1.4 var(--display); }
+  .unit-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .unit-row input { width: 110px; }
+  .unit-row .ref { padding: 0; }
+  .vd { padding: 12px 0; border-top: 1px solid var(--surface-2); }
+  .vd:first-child { border-top: 0; padding-top: 0; }
+  .vd-top { display: grid; grid-template-columns: minmax(0, 1fr) 44px; align-items: center; }
+  .vd-nm { min-width: 0; }
+  .vd-nm .tx:first-child { font-weight: 600; font-size: 17px; padding-bottom: 0; }
+  .seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-top: 8px; }
+  .seg button { min-height: 46px; border: 0; background: var(--surface); font-size: 15px; font-weight: 600; color: var(--ink-2); }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.on.todo { background: var(--surface-2); color: var(--ink); }
+  .seg button.on.talking { background: var(--warn-soft); color: var(--warn); }
+  .seg button.on.contract { background: var(--ok-soft); color: var(--ok); }
+  .vendor-add { display: grid; grid-template-columns: minmax(0, 1fr) 7em auto; gap: 8px; margin-top: 14px; }
+  .vendor-add input { min-width: 0; min-height: 48px; border: 1.5px dashed var(--line); background: transparent; border-radius: 12px; padding: 0 14px; }
+  .vendor-add input:focus { outline: none; border-style: solid; border-color: var(--accent); }
+
+  /* ---------- 시세 ---------- */
+  .acc { border-top: 1px solid var(--line); }
+  .acc:first-of-type { border-top: 0; }
+  .acc-h { width: 100%; min-height: 60px; display: grid; grid-template-columns: minmax(0, 1fr) 22px; align-items: center; gap: 10px; text-align: left; border: 0; background: transparent; padding: 8px 4px; }
+  .acc-h b { font-size: 17px; }
+  .acc-h small { display: block; font-size: 14px; color: var(--ink-2); }
+  .acc-b { padding: 0 4px 16px; }
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--surface-2); font-size: 16px; }
+  .kv:first-child { border-top: 0; }
   .kv span { color: var(--ink-2); min-width: 0; }
-  .kv b { font-weight: 500; white-space: nowrap; }
-  .chart { display: flex; align-items: flex-end; gap: 3px; height: 120px; padding-top: 18px; position: relative; }
+  .kv b { font-weight: 600; white-space: nowrap; }
+  .note { font-size: 15px; color: var(--ink-2); margin: 10px 0 0; line-height: 1.6; }
+  .chart { display: flex; align-items: flex-end; gap: 3px; height: 130px; padding-top: 22px; }
   .chart i { flex: 1; background: var(--surface-2); border-radius: 4px 4px 0 0; position: relative; min-width: 0; }
   .chart i.on { background: var(--accent); }
-  .chart i.on::after { content: attr(data-v); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); font: 700 11px var(--body); color: var(--accent); white-space: nowrap; margin-bottom: 3px; }
-  .chart-x { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--ink-2); margin-top: 4px; }
-  .mk .note { font-size: 11.5px; color: var(--ink-2); margin: 8px 0 0; line-height: 1.55; }
-  .case { padding: 8px 0; border-top: 1px solid var(--surface-2); font-size: 12.5px; }
-  .case:first-of-type { border-top: 0; }
-  .case b { font-weight: 700; color: var(--bad); }
+  .chart i.on::after { content: attr(data-v); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); font: 700 14px var(--body); color: var(--accent); white-space: nowrap; margin-bottom: 3px; }
+  .chart-x { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink-2); margin-top: 4px; }
+  .case { padding: 10px 0; border-top: 1px solid var(--surface-2); font-size: 16px; }
+  .case:first-child { border-top: 0; }
+  .case b { color: var(--bad); }
+  .case p { margin: 3px 0 0; color: var(--ink-2); font-size: 15px; overflow-wrap: anywhere; }
   .case a, .srcs a { color: var(--accent); }
-  .case p { margin: 2px 0 0; color: var(--ink-2); font-size: 11.5px; overflow-wrap: anywhere; }
-  .cmp { width: 100%; font-size: 12.5px; }
-  .cmp th { padding: 0 4px 6px; }
-  .cmp td { padding: 5px 4px; }
-  .srcs { margin: 0; padding-left: 18px; font-size: 12px; color: var(--ink-2); columns: 2; column-gap: 24px; }
-  .srcs a { color: var(--ink-2); }
-  .srcs a:hover { color: var(--accent); }
-  .mk-foot { margin-top: 14px; font-size: 11.5px; color: var(--ink-2); }
+  .table-scroll { overflow-x: auto; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 16px; }
+  table.cmp th { text-align: left; font-weight: 600; font-size: 15px; color: var(--ink-2); padding: 0 6px 8px; }
+  table.cmp th.r, table.cmp td.r { text-align: right; }
+  table.cmp td { padding: 9px 6px; border-top: 1px solid var(--surface-2); }
+  .srcs { margin: 0; padding-left: 20px; font-size: 15px; color: var(--ink-2); line-height: 1.8; }
 
-  footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
-  footer button { border: 0; background: transparent; color: var(--ink-2); text-decoration: underline; padding: 0; font-size: 12px; }
+  .linkish { min-height: 44px; border: 0; background: transparent; color: var(--accent); text-decoration: underline; font-weight: 600; padding: 0 4px; }
+  .foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 15px; color: var(--ink-2); }
+  .foot button { min-height: 44px; border: 0; background: transparent; color: var(--ink-2); text-decoration: underline; padding: 0 4px; font-size: 15px; }
 
-  @media (max-width: 900px) {
-    .cols { grid-template-columns: minmax(0, 1fr); }
-    .market { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-    .stats { grid-template-columns: 1fr 1fr; }
+  /* ---------- 토스트 ---------- */
+  .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 78px); z-index: 60; display: flex; align-items: center; gap: 14px; max-width: calc(100vw - 32px); background: var(--ink); color: var(--bg); border-radius: 14px; padding: 8px 8px 8px 18px; box-shadow: 0 8px 28px rgba(0, 0, 0, .3); font-size: 16px; }
+  .toast button { min-height: 44px; border: 0; background: transparent; color: var(--accent-soft); font-weight: 700; padding: 0 14px; border-radius: 10px; text-decoration: underline; }
+
+  /* ---------- 연동 설정 창 ---------- */
+  dialog { border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--ink); padding: 24px 26px; width: min(600px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; }
+  dialog::backdrop { background: rgba(0, 0, 0, .5); }
+  dialog h2 { margin: 0 0 8px; font: 700 22px var(--display); }
+  dialog p { margin: 0 0 12px; font-size: 15px; color: var(--ink-2); }
+  dialog ol { margin: 0 0 14px; padding-left: 22px; font-size: 15px; line-height: 1.75; }
+  dialog code { background: var(--surface-2); border-radius: 4px; padding: 0 5px; font-size: 14px; }
+  dialog a { color: var(--accent); }
+  dialog textarea { width: 100%; height: 130px; font: 13px/1.45 ui-monospace, Menlo, monospace; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); border-radius: 10px; padding: 10px; }
+  dialog .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  dialog .msg { margin-top: 12px; font-size: 15px; min-height: 1.4em; }
+  dialog .msg.bad { color: var(--bad); } dialog .msg.ok { color: var(--ok); }
+  dialog details { margin-bottom: 14px; }
+  dialog summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+
+  /* ---------- 태블릿 세로 (600px~) ---------- */
+  @media (min-width: 600px) {
+    .app { grid-template-areas: "top" "tabs" "main"; }
+    .top { grid-template-areas: "c d" "m d"; padding-left: 24px; padding-right: 24px; }
+    #dateLabel { display: inline; }
+    .dd { justify-self: end; justify-content: flex-end; }
+    .dd .big { text-align: right; }
+    .couple { font-size: 28px; }
+    .dd .big b { font-size: 60px; }
+    .ring { width: 76px; height: 76px; }
+    .meta { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .tabs { grid-area: tabs; position: sticky; top: 0; bottom: auto; display: flex; gap: 8px; padding: 10px 24px; background: var(--bg); border-top: 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+    .tab { flex: 1 1 0; flex-direction: row; gap: 10px; min-height: 54px; min-width: max-content; padding: 0 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); font-size: 17px; white-space: nowrap; }
+    .tab[aria-current="page"] { background: var(--accent-soft); border-color: var(--accent); }
+    .tab[aria-current="page"]::before { display: none; }
+    .tab .bdg { position: static; }
+    .main { padding: 20px 24px 48px; gap: 20px; }
+    .panel { gap: 20px; }
+    .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .sumbar { bottom: 12px; padding: 10px 18px; }
+    .sumbar div b { font-size: 20px; }
+    .toast { bottom: 28px; }
+    .card { padding: 24px; }
   }
-  @media (max-width: 600px) {
-    body { padding-top: 14px; }
-    .hero { grid-template-columns: 1fr; padding: 22px 20px; }
-    .dday { justify-content: space-between; }
-    .dday .big { text-align: left; }
-    .dday .big b { font-size: 52px; }
-    .couple { font-size: 19px; gap: 2px; }
-    .couple input { padding: 2px 0; min-width: 2em; }
-    .card { padding: 18px 16px; }
-    .vendor-add { grid-template-columns: 1fr 1fr; }
-    .vendor-add .btn { grid-column: 1 / -1; }
-    .market { grid-template-columns: minmax(0, 1fr); }
-    .mk.wide { grid-column: auto; }
-    .srcs { columns: 1; }
+
+  /* ---------- 태블릿 가로·큰 화면 (900px~): 왼쪽 사이드바 ---------- */
+  @media (min-width: 900px) {
+    .app { grid-template-columns: 224px minmax(0, 1fr); grid-template-areas: "top top" "tabs main"; align-items: start; }
+    .tabs { flex-direction: column; align-self: start; top: 0; padding: 20px 14px; gap: 8px; border-bottom: 0; overflow: visible; background: transparent; }
+    .tab { justify-content: flex-start; min-width: 0; }
+    .tab .bdg { margin-left: auto; }
+    .ov-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "a b" "a c"; }
+    .ov-grid > :nth-child(1) { grid-area: a; } .ov-grid > :nth-child(2) { grid-area: b; } .ov-grid > :nth-child(3) { grid-area: c; }
+    .two.t2 { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+    .two.t3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sticky { position: sticky; top: 16px; }
+    .sumbar { bottom: 16px; }
+  }
+  @media (min-width: 1500px) {
+    .ov-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-areas: "a b c"; }
+  }
+  @media (max-width: 599px) {
+    .phone-hide { display: none; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-
-  <section class="hero">
-    <div>
-      <h1 class="couple">
-        <input id="nameA" placeholder="이름" aria-label="첫 번째 이름" maxlength="12" size="3">
-        <span>와</span>
-        <input id="nameB" placeholder="이름" aria-label="두 번째 이름" maxlength="12" size="3">
-        <span>의 결혼준비</span>
-      </h1>
+<div class="app" id="app">
+  <header class="top">
+    <h1 class="couple">
+      <input id="nameA" placeholder="이름" aria-label="첫 번째 이름" maxlength="12" size="3">
+      <span>와</span>
+      <input id="nameB" placeholder="이름" aria-label="두 번째 이름" maxlength="12" size="3">
+      <span>의 결혼준비</span>
+    </h1>
+    <div class="meta">
       <div class="date-row">
         <label for="weddingDate">예식일</label>
         <input id="weddingDate" type="date">
         <span id="dateLabel"></span>
-        <button type="button" class="chip-btn" id="syncChip" data-s="off"><i></i><span id="syncText">저장: 이 브라우저</span></button>
       </div>
+      <button type="button" class="chip-btn" id="syncChip" data-s="off"><i></i><span id="syncText">저장: 이 브라우저</span></button>
     </div>
-    <div class="dday">
+    <div class="dd">
       <div class="big"><small>WEDDING DAY</small><b id="ddayNum" class="num">D-0</b><span id="ddaySub"></span></div>
       <div class="ring" aria-label="체크리스트 진행률">
-        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface-2)" stroke-width="9"/><circle id="ringArc" cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="263.9" style="transition: stroke-dashoffset .5s"/></svg>
-        <div class="t"><div><b id="ringPct" class="num">0%</b><small>준비 완료</small></div></div>
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--surface-2)" stroke-width="10"/><circle id="ringArc" cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="263.9" style="transition: stroke-dashoffset .5s"/></svg>
+        <div class="t"><span id="ringPct" class="num">0%</span></div>
       </div>
     </div>
-  </section>
+  </header>
 
-  <div class="example-bar" id="exampleBar" hidden>
-    <span>지금 보이는 숫자와 업체는 예시입니다. 예식일을 바꾸면 체크리스트 기한도 함께 바뀝니다.</span>
-    <button type="button" id="clearExample">예시 지우고 시작</button>
-  </div>
+  <nav class="tabs" id="tabs" aria-label="화면 이동"></nav>
 
-  <div class="sync-bar" id="syncBar" hidden>
-    <span id="syncMsg"></span>
-    <div id="syncBtns"></div>
-  </div>
-
-  <section class="stats" id="stats"></section>
-
-  <div class="cols">
-    <div class="col">
-      <section class="card">
-        <h2>지금 챙길 일 <small>기한이 가까운 순서</small></h2>
-        <p class="sub">체크리스트에서 아직 끝내지 않은 항목입니다.</p>
-        <div class="next" id="next"></div>
-      </section>
-      <section class="card">
-        <h2>준비 체크리스트 <small id="checkCount"></small></h2>
-        <p class="sub">기한은 예식일에서 거꾸로 계산됩니다. 항목은 직접 추가하거나 지울 수 있습니다.</p>
-        <div id="phases"></div>
-      </section>
+  <main class="main" id="main">
+    <div class="bar-note warn" id="exampleBar" hidden>
+      <span>지금 보이는 숫자와 업체는 예시입니다. 예식일을 바꾸면 체크리스트 기한도 함께 바뀝니다.</span>
+      <button type="button" id="clearExample">예시 지우고 시작</button>
     </div>
-
-    <div class="col">
-      <section class="card">
-        <h2>예산 <small>단위: 만원</small></h2>
-        <p class="sub">항목별로 계획한 금액과 쓴 금액을 적어 주세요. 신혼집 보증금은 포함하지 않았습니다.</p>
-        <div class="area-row">
-          <label for="area">시세 기준 지역</label>
-          <select id="area"></select>
-          <button class="btn" type="button" id="fillMarket" title="중간값이 있는 항목의 예산을 이 지역 시세로 바꿉니다">시세로 채우기</button>
-        </div>
-        <div class="table-scroll"><table>
-          <thead><tr><th>항목</th><th class="r">예산</th><th class="r">지출</th><th></th></tr></thead>
-          <tbody id="budgetRows"></tbody>
-          <tfoot><tr id="budgetTotal"></tr><tr class="net" id="budgetNet"></tr></tfoot>
-        </table></div>
-        <form class="add" id="budgetAdd" style="margin-top:14px">
-          <select id="budgetGroup" aria-label="예산 묶음"></select>
-          <input id="budgetName" placeholder="항목 추가 (예: 폐백, 하객 버스)" aria-label="예산 항목 이름" maxlength="24">
-          <button class="btn" type="submit">추가</button>
-        </form>
-      </section>
-
-      <section class="card">
-        <h2>하객 <small>단위: 명</small></h2>
-        <p class="sub">예상 인원과 참석 확정 인원을 구분해 적어 주세요.</p>
-        <div class="guest-grid">
-          <span></span><span class="h">예상</span><span class="h">확정</span>
-          <label for="gAe" id="lblA">첫 번째</label><input id="gAe" type="number" min="0" inputmode="numeric"><input id="gAc" type="number" min="0" inputmode="numeric" aria-label="첫 번째 사람 쪽 확정">
-          <label for="gBe" id="lblB">두 번째</label><input id="gBe" type="number" min="0" inputmode="numeric"><input id="gBc" type="number" min="0" inputmode="numeric" aria-label="두 번째 사람 쪽 확정">
-        </div>
-        <div class="guest-sum" id="guestSum"></div>
-        <div class="field-inline"><label for="unitCost">1인 식대</label><input id="unitCost" type="number" min="0" step="0.5" inputmode="decimal"><span class="unit">만원</span><span class="unit" id="unitRef"></span></div>
-      </section>
-
-      <section class="card">
-        <h2>업체 <small id="vendorCount"></small></h2>
-        <p class="sub">상담한 업체의 진행 상태를 기록하세요.</p>
-        <div id="vendors"></div>
-        <form class="vendor-add" id="vendorAdd">
-          <input id="vName" placeholder="업체 이름" aria-label="업체 이름" maxlength="24">
-          <input id="vCat" placeholder="분류" aria-label="업체 분류" maxlength="8">
-          <button class="btn" type="submit">추가</button>
-        </form>
-      </section>
+    <div class="bar-note bad" id="syncBar" hidden>
+      <span id="syncMsg"></span>
+      <div id="syncBtns"></div>
     </div>
-  </div>
-
-  <section class="card">
-    <h2>시세 참고 <small id="mkCollected"></small></h2>
-    <p class="sub">한국소비자원 참가격 계약 통계, 결혼정보회사 설문, 은행 축의금 데이터, 블로그·커뮤니티 후기를 모은 자료입니다. 지역을 바꾸면 함께 바뀝니다.</p>
-    <div class="market" id="market"></div>
-    <div class="mk-foot"><b>출처</b><ol class="srcs" id="mkSources"></ol></div>
-  </section>
-
-  <footer>
-    <span>입력한 내용은 이 브라우저에만 저장됩니다.</span>
-    <button type="button" id="resetAll">처음 상태(예시)로 되돌리기</button>
-  </footer>
+    <div id="panel" class="panel"></div>
+    <div class="foot">
+      <span>입력한 내용은 이 브라우저에 저장되고, 연동하면 두 분이 함께 봅니다.</span>
+      <button type="button" id="resetAll">처음 상태(예시)로 되돌리기</button>
+    </div>
+  </main>
 </div>
+
+<div class="toast" id="toast" role="status" hidden><span id="toastMsg"></span><button type="button" id="toastUndo">되돌리기</button></div>
 
 <dialog id="syncDialog" aria-labelledby="syncTitle">
   <h2 id="syncTitle">두 분이 같은 데이터 쓰기</h2>
@@ -541,73 +528,6 @@
   }
   const daysUntil = (d) => Math.round((midnight(d) - midnight(new Date())) / DAY);
 
-  function renderHero() {
-    $("nameA").value = S.a || "";
-    $("nameB").value = S.b || "";
-    fitNames();
-    document.title = `${S.a || "우리"}와 ${S.b || "우리"}의 결혼준비`;
-    $("lblA").textContent = S.a ? `${S.a} 쪽` : "첫 번째";
-    $("lblB").textContent = S.b ? `${S.b} 쪽` : "두 번째";
-    $("weddingDate").value = S.date || "";
-    const w = parseDate(S.date);
-    if (!w) { $("ddayNum").textContent = "D-?"; $("ddaySub").textContent = "예식일을 정해 주세요"; $("dateLabel").textContent = ""; return; }
-    const n = daysUntil(w);
-    $("ddayNum").textContent = n > 0 ? `D-${n}` : n === 0 ? "D-Day" : `D+${-n}`;
-    $("ddaySub").textContent = n > 0 ? `${Math.floor(n / 7)}주 ${n % 7}일 남았어요` : n === 0 ? "오늘이 예식일이에요" : "결혼을 축하드려요";
-    $("dateLabel").textContent = `${w.getFullYear()}년 ${w.getMonth() + 1}월 ${w.getDate()}일 (${DOW[w.getDay()]})`;
-  }
-
-  function renderStats() {
-    const done = S.tasks.filter((t) => t.done).length, total = S.tasks.length;
-    const plan = S.budget.reduce((a, b) => a + b.plan, 0), spent = S.budget.reduce((a, b) => a + b.spent, 0);
-    const g = S.guests, exp = g.ae + g.be, conf = g.ac + g.bc;
-    const vc = S.vendors.filter((v) => v.st === "contract").length;
-    const over = spent > plan && plan > 0;
-    $("stats").innerHTML = `
-      <div class="stat"><div class="k">체크리스트</div><div class="v num">${done}<small>/ ${total}개 완료</small></div><div class="meter"><i class="ok" style="width:${pct(done, total)}%"></i></div></div>
-      <div class="stat"><div class="k">예산 사용</div><div class="v num">${man(spent)}<small>/ ${man(plan)}만</small></div><div class="meter"><i class="${over ? "bad" : ""}" style="width:${pct(spent, plan)}%"></i></div></div>
-      <div class="stat"><div class="k">하객 확정</div><div class="v num">${conf}<small>/ 예상 ${exp}명</small></div><div class="meter"><i style="width:${pct(conf, exp)}%"></i></div></div>
-      <div class="stat"><div class="k">계약한 업체</div><div class="v num">${vc}<small>/ ${S.vendors.length}곳</small></div><div class="meter"><i class="ok" style="width:${pct(vc, S.vendors.length)}%"></i></div></div>`;
-    const p = pct(done, total);
-    $("ringPct").textContent = p + "%";
-    $("ringArc").style.strokeDashoffset = 263.9 * (1 - p / 100);
-  }
-
-  function renderNext() {
-    const list = [];
-    PHASES.forEach((p) => S.tasks.filter((t) => t.phase === p.id && !t.done).forEach((t) => list.push({ t, d: dueDate(p.id) })));
-    const top = list.slice(0, 4);
-    $("next").innerHTML = top.length
-      ? top.map(({ t, d }) => {
-          const n = d ? daysUntil(d) : null;
-          const late = n !== null && n < 0;
-          const lab = n === null ? "-" : late ? `${-n}일 지남` : n === 0 ? "오늘" : `D-${n}`;
-          return `<div class="next-item"><span class="d num ${late ? "late" : ""}">${lab}</span><span>${esc(t.t)}</span></div>`;
-        }).join("")
-      : `<div class="empty">남은 일이 없어요. 모든 준비가 끝났습니다.</div>`;
-  }
-
-  function renderPhases() {
-    $("checkCount").textContent = `${S.tasks.filter((t) => t.done).length} / ${S.tasks.length}`;
-    $("phases").innerHTML = PHASES.map((p) => {
-      const ts = S.tasks.filter((t) => t.phase === p.id);
-      const done = ts.filter((t) => t.done).length;
-      const d = dueDate(p.id);
-      const n = d ? daysUntil(d) : null;
-      const allDone = ts.length > 0 && done === ts.length;
-      const late = !allDone && n !== null && n < 0;
-      return `<div class="phase">
-        <div class="phase-h"><b>${p.label}</b><span class="due num">${d ? "~ " + fmtMD(d) : ""}</span>
-          ${allDone ? '<span class="badge ok">완료</span>' : late ? '<span class="badge late">기한 지남</span>' : ""}
-          <span class="cnt num">${done}/${ts.length}</span></div>
-        <ul class="tasks">${ts.map((t) => `<li class="task ${t.done ? "done" : ""}">
-          <label><input type="checkbox" data-task="${t.id}" ${t.done ? "checked" : ""}><span>${esc(t.t)}</span></label>
-          <button class="x" type="button" data-deltask="${t.id}" aria-label="${esc(t.t)} 삭제">×</button></li>`).join("")}</ul>
-        <form class="add" data-addtask="${p.id}"><input placeholder="할 일 추가" aria-label="${p.label} 할 일 추가" maxlength="40"><button class="btn" type="submit">추가</button></form>
-      </div>`;
-    }).join("");
-  }
-
   // ---- 시세 (market-data) ----
   const AREA = () => (M && M.areas[S.area] ? S.area : "nation");
   const opt = (name) => (M && M.optional[name] ? M.optional[name][AREA()] : null);
@@ -677,119 +597,281 @@
     return Math.round(n * M.areas[AREA()].gift * GIFT_RATE);
   }
 
-  function renderBudget() {
-    const sum = (arr, k) => arr.reduce((x, y) => x + y[k], 0);
-    const row = (b) => {
-      const over = b.spent > b.plan;
-      return `<tr>
-        <td><div class="nm">${esc(b.name)}</div>${refHtml(b)}<div class="bar"><i class="${over ? "bad" : ""}" style="width:${pct(b.spent, b.plan || b.spent)}%"></i></div>${over ? `<div class="over num">${man(b.spent - b.plan)}만 초과</div>` : ""}</td>
-        <td class="r"><input type="number" min="0" inputmode="decimal" value="${b.plan || ""}" data-bplan="${b.id}" aria-label="${esc(b.name)} 예산"></td>
-        <td class="r"><input type="number" min="0" inputmode="decimal" value="${b.spent || ""}" data-bspent="${b.id}" aria-label="${esc(b.name)} 지출"></td>
-        <td class="r"><button class="x" type="button" data-delbudget="${b.id}" aria-label="${esc(b.name)} 삭제">×</button></td></tr>`;
-    };
-    const html = GROUPS.map((g) => {
+  // =====================================================================
+  // 화면 (탭 + 종합 페이지). 데이터(S)는 위쪽 코드, 동기화는 아래쪽 코드가 맡는다.
+  // =====================================================================
+  const UI_KEY = "wedding-ui-v1";
+  const TAB_IDS = ["overview", "tasks", "budget", "people", "market"];
+  let UI = {};
+  try { UI = JSON.parse(localStorage.getItem(UI_KEY)) || {}; } catch (e) { UI = {}; }
+  UI.open = UI.open || {}; UI.filter = UI.filter || "all";
+  if (!TAB_IDS.includes(UI.tab)) UI.tab = "overview";
+  const hashTab = () => { const h = location.hash.slice(1); return TAB_IDS.includes(h) ? h : null; };
+  if (hashTab()) UI.tab = hashTab();
+  const saveUI = () => { try { localStorage.setItem(UI_KEY, JSON.stringify(UI)); } catch (e) {} };
+  const isWide = () => window.matchMedia("(min-width: 600px)").matches;
+  const isOpen = (k, def) => (k in UI.open ? UI.open[k] : def);
+
+  const SVG = (inner) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+  const ICON = {
+    overview: SVG('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'),
+    tasks: SVG('<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'),
+    budget: SVG('<circle cx="12" cy="12" r="9"/><path d="M14.6 9.3c-.4-.8-1.4-1.3-2.6-1.3-1.4 0-2.5.7-2.5 1.8s1 1.6 2.5 2 2.5.9 2.5 2-1.1 1.8-2.5 1.8c-1.1 0-2.2-.5-2.6-1.4M12 6v2m0 8v2"/>'),
+    people: SVG('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.7.2 4.5 2 4.5 4.8"/>'),
+    market: SVG('<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>'),
+  };
+  const CHEV = SVG('<path d="M9 6l6 6-6 6"/>').replace("<svg ", '<svg class="chev" ');
+  const TABS = [["overview", "종합"], ["tasks", "할 일"], ["budget", "예산"], ["people", "하객·업체"], ["market", "시세"]];
+
+  // ---- 계산 ----
+  function phaseInfo(p) {
+    const ts = S.tasks.filter((t) => t.phase === p.id), done = ts.filter((t) => t.done).length;
+    const d = dueDate(p.id), n = d ? daysUntil(d) : null;
+    return { p, ts, done, d, n, all: ts.length > 0 && done === ts.length, late: n !== null && n < 0 && done < ts.length };
+  }
+  const phases = () => PHASES.map(phaseInfo);
+  const curPhase = () => phases().find((i) => i.done < i.ts.length) || null;
+  const overdueCount = () => phases().filter((i) => i.late).reduce((a, i) => a + i.ts.length - i.done, 0);
+  const sumOf = (arr, k) => arr.reduce((x, y) => x + y[k], 0);
+  const nameA = () => (S.a ? `${S.a} 쪽` : "첫 번째"), nameB = () => (S.b ? `${S.b} 쪽` : "두 번째");
+
+  // ---- 공통 조각 ----
+  const card = (title, body, { right = "", sub = "", cls = "" } = {}) =>
+    `<section class="card ${cls}"><h2>${title}${right ? `<small>${right}</small>` : ""}</h2>${sub ? `<p class="sub">${sub}</p>` : ""}${body}</section>`;
+  const acc = (key, title, sub, body, def) => {
+    const open = isOpen(key, def);
+    return `<section class="acc"><button type="button" class="acc-h" data-open="${key}" data-def="${def ? 1 : 0}" aria-expanded="${open}"><span><b>${title}</b>${sub ? `<small>${sub}</small>` : ""}</span>${CHEV}</button>${open ? `<div class="acc-b">${body}</div>` : ""}</section>`;
+  };
+  const edSpan = (kind, id, field, text, cls = "") =>
+    `<span class="tx ${cls}" data-ed="${kind}:${id}:${field}" tabindex="0" role="button" aria-label="${esc(text)} 고치기">${esc(text)}</span>`;
+
+  // ---- 요약 타일 ----
+  function modStats() {
+    const done = S.tasks.filter((t) => t.done).length, total = S.tasks.length;
+    const plan = sumOf(S.budget, "plan"), spent = sumOf(S.budget, "spent"), over = spent > plan && plan > 0;
+    const g = S.guests, exp = g.ae + g.be, conf = g.ac + g.bc, vc = S.vendors.filter((v) => v.st === "contract").length;
+    const tile = (go, k, v, small, pc, cls) => `<button type="button" class="stat" data-go="${go}"><div class="k">${k}</div><div class="v num">${v}<small>${small}</small></div><div class="meter"><i class="${cls || ""}" style="width:${pc}%"></i></div></button>`;
+    return `<div class="stats">
+      ${tile("tasks", "체크리스트", done, `/ ${total}개 완료`, pct(done, total), "ok")}
+      ${tile("budget", "예산 사용", man(spent), `/ ${man(plan)}만`, pct(spent, plan), over ? "bad" : "")}
+      ${tile("people", "하객 확정", conf, `/ 예상 ${exp}명`, pct(conf, exp))}
+      ${tile("people", "계약한 업체", vc, `/ ${S.vendors.length}곳`, pct(vc, S.vendors.length), "ok")}</div>`;
+  }
+
+  // ---- 할 일 ----
+  function taskRow(t) {
+    return `<li class="task ${t.done ? "done" : ""}"><label class="ck"><input type="checkbox" data-task="${t.id}" ${t.done ? "checked" : ""} aria-label="${esc(t.t)} 완료"></label>${edSpan("task", t.id, "t", t.t)}<button type="button" class="x" data-del="task:${t.id}" aria-label="${esc(t.t)} 삭제">×</button></li>`;
+  }
+  function modNext(limit = 6) {
+    const list = [];
+    phases().forEach((i) => i.ts.filter((t) => !t.done).forEach((t) => list.push({ t, i })));
+    if (!list.length) return '<div class="empty">남은 일이 없어요. 모든 준비가 끝났습니다.</div>';
+    return `<ul class="tasks">${list.slice(0, limit).map(({ t, i }) => {
+      const n = i.n, late = n !== null && n < 0, lab = n === null ? "" : late ? `${-n}일 지남` : n === 0 ? "오늘" : `D-${n}`;
+      return `<li class="task nx"><label class="ck"><input type="checkbox" data-task="${t.id}" aria-label="${esc(t.t)} 완료"></label><div>${lab ? `<span class="when num ${late ? "late" : ""}">${lab}</span>` : ""}${edSpan("task", t.id, "t", t.t).replace('class="tx ', 'style="display:inline" class="tx ')}</div></li>`;
+    }).join("")}</ul>${list.length > limit ? `<p class="note">그 밖에 ${list.length - limit}개가 더 있어요. <button type="button" class="linkish" data-go="tasks">전체 보기</button></p>` : ""}`;
+  }
+  function modTasks(ctx) {
+    const f = ctx === "tab" ? UI.filter : "all", cur = curPhase(), all = phases();
+    const nTodo = S.tasks.filter((t) => !t.done).length, nLate = overdueCount();
+    const chips = ctx === "tab" ? `<div class="chips" role="group" aria-label="보기 방식">${[["all", `전체 ${S.tasks.length}`], ["todo", `남은 일 ${nTodo}`], ["late", `기한 지남 ${nLate}`]]
+      .map(([k, l]) => `<button type="button" data-filter="${k}" aria-pressed="${f === k}">${l}</button>`).join("")}</div>` : "";
+    const body = all.map((i) => {
+      let ts = i.ts;
+      if (f === "todo") ts = ts.filter((t) => !t.done);
+      if (f === "late") ts = i.late ? ts.filter((t) => !t.done) : [];
+      if (f !== "all" && !ts.length) return "";
+      const key = `t:${ctx}:${i.p.id}`, def = ctx === "tab" ? !!(cur && cur.p.id === i.p.id) || i.late : !!(cur && cur.p.id === i.p.id);
+      const open = f !== "all" ? true : isOpen(key, def);
+      return `<div class="phase"><button type="button" class="ph" data-open="${key}" data-def="${def ? 1 : 0}" aria-expanded="${open}">${CHEV}
+        <span class="t1"><b>${i.p.label}</b><span class="due num">${i.d ? "~ " + fmtMD(i.d) : ""}</span>${i.all ? '<span class="badge ok">완료</span>' : i.late ? '<span class="badge late">기한 지남</span>' : ""}</span>
+        <span class="cnt num">${i.done}/${i.ts.length}</span></button>
+        <div class="meter"><i class="${i.all ? "ok" : ""}" style="width:${pct(i.done, i.ts.length)}%"></i></div>
+        ${open ? `<ul class="tasks">${ts.map(taskRow).join("")}</ul><form class="add" data-addtask="${i.p.id}"><input placeholder="할 일 추가" aria-label="${i.p.label} 할 일 추가" maxlength="40"><button class="btn" type="submit">추가</button></form>` : ""}</div>`;
+    }).join("");
+    return chips + (body || '<div class="empty">해당하는 일이 없어요.</div>');
+  }
+
+  // ---- 예산 ----
+  function budgetRow(b) {
+    const over = b.spent > b.plan;
+    return `<div class="bi"><div class="nm">${edSpan("budget", b.id, "name", b.name)}${refHtml(b)}${over ? `<div class="over num">${man(b.spent - b.plan)}만 초과</div>` : ""}</div>
+      <label class="fld"><span>예산</span><input type="number" min="0" inputmode="decimal" value="${b.plan || ""}" data-bplan="${b.id}" aria-label="${esc(b.name)} 예산 (만원)"></label>
+      <label class="fld"><span>지출</span><input type="number" min="0" inputmode="decimal" value="${b.spent || ""}" data-bspent="${b.id}" aria-label="${esc(b.name)} 지출 (만원)"></label>
+      <button type="button" class="x" data-del="budget:${b.id}" aria-label="${esc(b.name)} 삭제">×</button>
+      <div class="bar"><i class="${over ? "bad" : ""}" style="width:${pct(b.spent, b.plan || b.spent)}%"></i></div></div>`;
+  }
+  function modBudget(ctx) {
+    const plan = sumOf(S.budget, "plan"), spent = sumOf(S.budget, "spent"), gift = giftEstimate(), net = Math.max(0, plan - gift);
+    const areaRow = ctx === "tab" && M ? `<div class="area-row"><label for="area">시세 기준 지역</label><select id="area">${Object.entries(M.areas).map(([k, a]) => `<option value="${k}" ${k === AREA() ? "selected" : ""}>${a.label}</option>`).join("")}</select><button class="btn" type="button" id="fillMarket" title="중간값이 있는 항목의 예산을 이 지역 시세로 바꿉니다">시세로 채우기</button></div>` : "";
+    const groups = GROUPS.map((g) => {
       const items = S.budget.filter((b) => (b.g || "기타") === g);
       if (!items.length) return "";
-      return `<tr class="grp"><td>${g}</td><td class="r num">${man(sum(items, "plan"))}</td><td class="r num">${man(sum(items, "spent"))}</td><td></td></tr>` + items.map(row).join("");
+      const key = `b:${ctx}:${g}`, def = ctx === "tab" && isWide(), open = isOpen(key, def), gp = sumOf(items, "plan"), gs = sumOf(items, "spent");
+      return `<div class="bg"><button type="button" class="gh" data-open="${key}" data-def="${def ? 1 : 0}" aria-expanded="${open}">${CHEV}<b>${g}</b><span class="gs num">${man(gs)} <small>/ ${man(gp)}만</small></span></button>
+        <div class="meter" style="margin:6px 4px 0"><i class="${gs > gp ? "bad" : ""}" style="width:${pct(gs, gp || gs)}%"></i></div>${open ? items.map(budgetRow).join("") : ""}</div>`;
     }).join("");
-    $("budgetRows").innerHTML = html || `<tr><td colspan="4" class="empty">예산 항목을 추가해 주세요.</td></tr>`;
-    $("budgetTotal").innerHTML = `<td>합계</td><td class="r num">${man(sum(S.budget, "plan"))}</td><td class="r num">${man(sum(S.budget, "spent"))}</td><td></td>`;
-    const gift = giftEstimate();
-    $("budgetNet").innerHTML = gift
-      ? `<td colspan="4">예상 축의금 ${man(gift)}만을 빼면 실부담 약 <b class="num">${man(Math.max(0, sum(S.budget, "plan") - gift))}만원</b></td>`
-      : "";
+    const totals = `<div class="tot"><div><small>예산 합계</small><b class="num">${man(plan)}만</b></div><div><small>지출 합계</small><b class="num">${man(spent)}만</b></div>
+      ${gift ? `<div><small>예상 축의금</small><b class="num">${man(gift)}만</b></div><div class="net"><small>축의금 뺀 실부담</small><b class="num">${man(net)}만</b></div>` : ""}</div>`;
+    const add = `<form class="add" id="budgetAdd"><select id="budgetGroup" aria-label="예산 묶음">${GROUPS.map((g) => `<option ${g === "기타" ? "selected" : ""}>${g}</option>`).join("")}</select><input id="budgetName" placeholder="항목 추가 (예: 폐백, 하객 버스)" aria-label="예산 항목 이름" maxlength="24"><button class="btn" type="submit">추가</button></form>`;
+    return areaRow + (groups || '<div class="empty">예산 항목을 추가해 주세요.</div>') + (ctx === "ov" ? totals : "") + add;
+  }
+  function sumBar() {
+    const plan = sumOf(S.budget, "plan"), spent = sumOf(S.budget, "spent"), gift = giftEstimate();
+    return `<div class="sumbar" aria-label="예산 합계"><div><small>예산</small><b class="num">${man(plan)}만</b></div><div><small>지출</small><b class="num">${man(spent)}만</b></div>
+      ${gift ? `<div><small>예상 축의금</small><b class="num">${man(gift)}만</b></div><div class="net"><small>실부담</small><b class="num">${man(Math.max(0, plan - gift))}만</b></div>` : ""}</div>`;
   }
 
-  function renderGuests() {
-    const g = S.guests;
-    $("gAe").value = g.ae || ""; $("gAc").value = g.ac || ""; $("gBe").value = g.be || ""; $("gBc").value = g.bc || ""; $("unitCost").value = g.unit || "";
-    const exp = g.ae + g.be, conf = g.ac + g.bc;
-    const cost = (conf || exp) * g.unit;
-    const gift = giftEstimate();
-    const A = M ? M.areas[AREA()] : null;
-    $("guestSum").innerHTML = `
-      <div><small>확정 / 예상</small><b class="num">${conf} / ${exp}명</b></div>
-      <div><small>예상 식대 (${conf ? "확정" : "예상"} 인원 기준)</small><b class="num">${man(cost)}만원</b></div>
-      ${A ? `<div style="grid-column:1/-1"><small>예상 축의금 (평균 ${A.gift}만원 × ${Math.max(exp, conf)}명 × ${GIFT_RATE * 100}%)</small><b class="num">${man(gift)}만원</b><small>봉투는 하객 1인이 아니라 가족·일행 단위로 내는 경우가 많아 60%로 계산했습니다.</small></div>` : ""}`;
-    $("unitRef").textContent = A ? `· ${A.label} 중간값 ${A.perGuest}만원` : "";
+  // ---- 하객·업체 ----
+  function modGuests() {
+    const g = S.guests, exp = g.ae + g.be, conf = g.ac + g.bc, A = M ? M.areas[AREA()] : null, gift = giftEstimate(), cost = (conf || exp) * g.unit;
+    return `<div class="gg"><span></span><span class="h2">예상</span><span class="h2">확정</span>
+      <label for="gAe">${esc(nameA())}</label><input id="gAe" type="number" min="0" inputmode="numeric" value="${g.ae || ""}"><input id="gAc" type="number" min="0" inputmode="numeric" value="${g.ac || ""}" aria-label="${esc(nameA())} 확정">
+      <label for="gBe">${esc(nameB())}</label><input id="gBe" type="number" min="0" inputmode="numeric" value="${g.be || ""}"><input id="gBc" type="number" min="0" inputmode="numeric" value="${g.bc || ""}" aria-label="${esc(nameB())} 확정"></div>
+      <div class="sum2"><div><small>확정 / 예상</small><b class="num">${conf} / ${exp}명</b></div><div><small>예상 식대 (${conf ? "확정" : "예상"} 인원)</small><b class="num">${man(cost)}만원</b></div>
+      ${A ? `<div class="full"><small>예상 축의금 (평균 ${A.gift}만원 × ${Math.max(exp, conf)}명 × ${GIFT_RATE * 100}%)</small><b class="num">${man(gift)}만원</b></div>` : ""}</div>
+      <div class="unit-row"><label for="unitCost">1인 식대</label><input id="unitCost" type="number" min="0" step="0.5" inputmode="decimal" value="${g.unit || ""}"><span>만원</span>${A ? `<span class="ref">${A.label} 중간값 ${A.perGuest}만원</span>` : ""}</div>`;
+  }
+  function modVendors() {
+    const list = S.vendors.map((v) => `<div class="vd"><div class="vd-top"><div class="vd-nm">${edSpan("vendor", v.id, "name", v.name)}${edSpan("vendor", v.id, "cat", v.cat || "분류 추가", "sm")}</div>
+      <button type="button" class="x" data-del="vendor:${v.id}" aria-label="${esc(v.name)} 삭제">×</button></div>
+      <div class="seg" role="group" aria-label="${esc(v.name)} 진행 상태">${Object.entries(STATUS).map(([k, l]) => `<button type="button" data-vset="${v.id}:${k}" aria-pressed="${v.st === k}" class="${v.st === k ? "on " + k : ""}">${l}</button>`).join("")}</div></div>`).join("");
+    return (list || '<div class="empty">상담한 업체를 추가해 보세요.</div>') +
+      `<form class="vendor-add" id="vendorAdd"><input id="vName" placeholder="업체 이름" aria-label="업체 이름" maxlength="24"><input id="vCat" placeholder="분류" aria-label="업체 분류" maxlength="8"><button class="btn" type="submit">추가</button></form>`;
   }
 
-  function renderVendors() {
-    $("vendorCount").textContent = `${S.vendors.length}곳`;
-    $("vendors").innerHTML = S.vendors.length ? S.vendors.map((v) => `<div class="vendor">
-      <div class="nm"><b>${esc(v.name)}</b><small>${esc(v.cat || "분류 없음")}</small></div>
-      <select data-vst="${v.id}" data-st="${v.st}" aria-label="${esc(v.name)} 진행 상태">${Object.entries(STATUS).map(([k, l]) => `<option value="${k}" ${v.st === k ? "selected" : ""}>${l}</option>`).join("")}</select>
-      <button class="x" type="button" data-delvendor="${v.id}" aria-label="${esc(v.name)} 삭제">×</button></div>`).join("")
-      : `<div class="empty">상담한 업체를 추가해 보세요.</div>`;
-  }
-
-  function renderMarket() {
-    if (!M) { $("market").innerHTML = '<div class="empty">시세 데이터가 없습니다. tools/build_market.py 로 넣어 주세요.</div>'; return; }
+  // ---- 시세 ----
+  function modMarket() {
+    if (!M) return card("시세 참고", '<div class="empty">시세 데이터가 없습니다. tools/build_market.py 로 넣어 주세요.</div>');
     const A = M.areas[AREA()], k = AREA();
-    $("mkCollected").textContent = `${M.collected} 수집`;
-    // 1) 지역 요약
-    const region = `<div class="mk"><h3>${A.label}<small>참가격 중간값</small></h3>
-      <div class="kv"><span>예식장 대관료</span><b class="num">${man(A.hall)}만원</b></div>
-      <div class="kv"><span>1인 식대</span><b class="num">${A.perGuest}만원</b></div>
-      <div class="kv"><span>최소 보증인원</span><b class="num">${A.guarantee}명</b></div>
-      <div class="kv"><span>스드메 패키지</span><b class="num">${man(A.sdeme)}만원</b></div>
-      <div class="kv"><span>드레스 / 스튜디오</span><b class="num">${A.dress} / ${A.studio}만원</b></div>
-      <div class="kv"><span>평균 축의금</span><b class="num">${A.gift}만원</b></div></div>`;
-    // 2) 예식 월별 예식장 총 계약금액
+    const areaRow = `<div class="area-row"><label for="area">시세 기준 지역</label><select id="area">${Object.entries(M.areas).map(([q, a]) => `<option value="${q}" ${q === k ? "selected" : ""}>${a.label}</option>`).join("")}</select></div>`;
+    const region = `<div class="kv"><span>예식장 대관료</span><b class="num">${man(A.hall)}만원</b></div><div class="kv"><span>1인 식대</span><b class="num">${A.perGuest}만원</b></div>
+      <div class="kv"><span>최소 보증인원</span><b class="num">${A.guarantee}명</b></div><div class="kv"><span>스드메 패키지</span><b class="num">${man(A.sdeme)}만원</b></div>
+      <div class="kv"><span>드레스 / 스튜디오</span><b class="num">${A.dress} / ${A.studio}만원</b></div><div class="kv"><span>평균 축의금</span><b class="num">${A.gift}만원</b></div>`;
     const w = parseDate(S.date), wm = w ? `${w.getFullYear()}-${String(w.getMonth() + 1).padStart(2, "0")}` : "";
-    const max = Math.max(...M.monthly.map((x) => x.hall));
-    const hit = M.monthly.find((x) => x.m === wm);
-    const low = M.monthly.reduce((a, b) => (b.hall < a.hall ? b : a));
-    const months = `<div class="mk wide"><h3>예식 월별 예식장 계약금액<small>전국 중간값 · 대관+식대 포함</small></h3>
-      <div class="chart" role="img" aria-label="예식 월별 예식장 계약금액 중간값">${M.monthly.map((x) =>
-        `<i class="${x.m === wm ? "on" : ""}" style="height:${(x.hall / max) * 100}%" data-v="${man(x.hall)}만" title="${x.m}: ${man(x.hall)}만원 (${x.n.toLocaleString()}건)"></i>`).join("")}</div>
+    const max = Math.max(...M.monthly.map((x) => x.hall)), hit = M.monthly.find((x) => x.m === wm), low = M.monthly.reduce((a, b) => (b.hall < a.hall ? b : a));
+    const months = `<div class="chart" role="img" aria-label="예식 월별 예식장 계약금액 중간값">${M.monthly.map((x) => `<i class="${x.m === wm ? "on" : ""}" style="height:${(x.hall / max) * 100}%" data-v="${man(x.hall)}만" title="${x.m}: ${man(x.hall)}만원 (${x.n.toLocaleString()}건)"></i>`).join("")}</div>
       <div class="chart-x"><span>${M.monthly[0].m}</span><span>${M.monthly[M.monthly.length - 1].m}</span></div>
-      <p class="note">${hit ? `예식 월(${wm}) 중간값은 <b>${man(hit.hall)}만원</b>입니다. ` : `예식 월(${wm || "미정"})은 자료 범위 밖입니다. `}
-      가장 낮은 달은 ${low.m} (${man(low.hall)}만원). 성수기 중간값 ${man(M.season.peak)}만원, 비수기 ${man(M.season.off)}만원으로 비수기가 ${man(M.season.peak - M.season.off)}만원 저렴합니다.</p></div>`;
-    // 3) 식사 형태별 식대
-    const meal = `<div class="mk"><h3>식사 형태별 1인 식대<small>전국 평균</small></h3>
-      ${Object.entries(M.meal).map(([n, v]) => `<div class="kv"><span>${n}</span><b class="num">${v}만원</b></div>`).join("")}
-      <p class="note">하객 ${guestsFor()}명이면 코스와 한상차림의 차이는 약 ${man((M.meal["코스"] - M.meal["한상차림"]) * guestsFor())}만원입니다.</p></div>`;
-    // 4) 자주 붙는 추가금
+      <p class="note">${hit ? `예식 월(${wm}) 중간값은 <b>${man(hit.hall)}만원</b>입니다. ` : `예식 월(${wm || "미정"})은 자료 범위 밖입니다. `}가장 낮은 달은 ${low.m} (${man(low.hall)}만원). 성수기 ${man(M.season.peak)}만원, 비수기 ${man(M.season.off)}만원으로 비수기가 ${man(M.season.peak - M.season.off)}만원 저렴합니다.</p>`;
+    const meal = Object.entries(M.meal).map(([n, v]) => `<div class="kv"><span>${n}</span><b class="num">${v}만원</b></div>`).join("") +
+      `<p class="note">하객 ${guestsFor()}명이면 코스와 한상차림의 차이는 약 ${man((M.meal["코스"] - M.meal["한상차림"]) * guestsFor())}만원입니다.</p>`;
     const extras = ["드레스 헬퍼(촬영)", "드레스 헬퍼(본식)", "드레스 기본 피팅비", "드레스 재가봉비", "드레스 지정비", "가봉스냅", "본식 원판 구매", "포토테이블", "플라워 샤워", "축주비", "웨딩케이크", "폐백 음식"];
-    const fees = `<div class="mk"><h3>자주 붙는 추가금<small>${A.label} 중간값</small></h3>
-      ${extras.filter((n) => M.optional[n]).map((n) => `<div class="kv"><span>${n}</span><b class="num">${M.optional[n][k]}만원</b></div>`).join("")}
-      <p class="note">계약 전에 견적서에 포함됐는지 하나씩 확인하세요.</p></div>`;
-    // 5) 실제 추가금 사례
-    const cases = `<div class="mk"><h3>실제 추가금 사례<small>후기</small></h3>
-      ${M.extra.map((x) => `<div class="case">${x.cat} 계약 ${man(x.contract)}만 → 최종 ${man(x.final)}만 <b>+${man(x.diff)}만 (${x.pct}%)</b>
-        <p>${esc(x.note)} · <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.src)}</a></p></div>`).join("")}</div>`;
-    // 6) 우리 계획 vs 설문 평균
-    const grp = (re) => S.budget.filter((b) => re.test(b.name)).reduce((a, b) => a + b.plan, 0);
-    const d = M.surveys.duo, gy = M.surveys.gayeon;
-    const rowsCmp = [
-      ["예식장", grp(/대관|식대/), d.hall, gy.hall], ["스드메", grp(/스드메/), d.sdeme, gy.sdeme], ["예물", grp(/예물|웨딩링|반지/), d.gifts, gy.gifts],
+    const fees = extras.filter((n) => M.optional[n]).map((n) => `<div class="kv"><span>${n}</span><b class="num">${M.optional[n][k]}만원</b></div>`).join("") + `<p class="note">계약 전에 견적서에 포함됐는지 하나씩 확인하세요.</p>`;
+    const cases = M.extra.map((x) => `<div class="case">${x.cat} 계약 ${man(x.contract)}만 → 최종 ${man(x.final)}만 <b>+${man(x.diff)}만 (${x.pct}%)</b><p>${esc(x.note)} · <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.src)}</a></p></div>`).join("");
+    const grp = (re) => S.budget.filter((b) => re.test(b.name)).reduce((a, b) => a + b.plan, 0), d = M.surveys.duo, gy = M.surveys.gayeon;
+    const rowsCmp = [["예식장", grp(/대관|식대/), d.hall, gy.hall], ["스드메", grp(/스드메/), d.sdeme, gy.sdeme], ["예물", grp(/예물|웨딩링|반지/), d.gifts, gy.gifts],
       ["예단·이바지", grp(/예단|이바지/), d.yedan + d.ibaji, gy.yedan], ["혼수", grp(/혼수|가전|가구/), d.honsu, gy.honsu], ["신혼여행", grp(/신혼여행/), d.honeymoon, null],
-      ["합계 (신혼집 제외)", S.budget.reduce((a, b) => a + b.plan, 0), d.total, gy.total],
-    ];
-    const cmp = `<div class="mk wide"><h3>우리 계획과 설문 평균 비교<small>만원</small></h3>
-      <div class="table-scroll"><table class="cmp"><thead><tr><th>항목</th><th class="r">우리 계획</th><th class="r">듀오 2026</th><th class="r">가연 2024</th></tr></thead><tbody>
-      ${rowsCmp.map(([n, a, b, c]) => `<tr><td>${n}</td><td class="r num"><b>${man(a)}</b></td><td class="r num">${b == null ? "-" : man(b)}</td><td class="r num">${c == null ? "-" : man(c)}</td></tr>`).join("")}
-      </tbody></table></div>
-      <p class="note">설문은 예물·예단을 모두 한 부부까지 포함한 평균입니다. 듀오 응답자가 예상한 작은 결혼식 비용은 ${man(d.small)}만원입니다.</p></div>`;
-    // 7) 지원 제도
-    const support = `<div class="mk"><h3>지자체 지원<small>2026</small></h3>
-      ${M.support.map((x) => {
-        const cap = x.note === "상한", cond = x.note && !cap ? ` (${esc(x.note.replace(/\s*무료$/, ""))})` : "";
-        return `<div class="kv"><span>${esc(x.org)} ${esc(x.metric)}${cond}</span><b class="num">${x.value ? (cap ? "최대 " : "") + man(x.value) + "만원" : "무료"}</b></div>`;
-      }).join("")}
-      <p class="note">신청 조건과 기간은 각 지자체에 확인하세요.</p></div>`;
-    $("market").innerHTML = region + months + meal + fees + cases + cmp + support;
-    $("mkSources").innerHTML = M.sources.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)}</a></li>`).join("");
+      ["합계 (신혼집 제외)", sumOf(S.budget, "plan"), d.total, gy.total]];
+    const cmp = `<div class="table-scroll"><table class="cmp"><thead><tr><th>항목</th><th class="r">우리 계획</th><th class="r">듀오 2026</th><th class="r">가연 2024</th></tr></thead><tbody>${rowsCmp.map(([n, a, b, c]) => `<tr><td>${n}</td><td class="r num"><b>${man(a)}</b></td><td class="r num">${b == null ? "-" : man(b)}</td><td class="r num">${c == null ? "-" : man(c)}</td></tr>`).join("")}</tbody></table></div>
+      <p class="note">설문은 예물·예단을 모두 한 부부까지 포함한 평균입니다. 듀오 응답자가 예상한 작은 결혼식 비용은 ${man(d.small)}만원입니다.</p>`;
+    const support = M.support.map((x) => { const cap = x.note === "상한", cond = x.note && !cap ? ` (${esc(x.note.replace(/\s*무료$/, ""))})` : "";
+      return `<div class="kv"><span>${esc(x.org)} ${esc(x.metric)}${cond}</span><b class="num">${x.value ? (cap ? "최대 " : "") + man(x.value) + "만원" : "무료"}</b></div>`; }).join("") + `<p class="note">신청 조건과 기간은 각 지자체에 확인하세요.</p>`;
+    const srcs = `<ol class="srcs">${M.sources.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.name)}</a></li>`).join("")}</ol>`;
+    return card("시세 참고", areaRow +
+      acc("m:region", A.label, "참가격 중간값", region, true) + acc("m:months", "예식 월별 예식장 계약금액", "전국 중간값 · 대관+식대 포함", months, true) +
+      acc("m:meal", "식사 형태별 1인 식대", "전국 평균", meal, false) + acc("m:fees", "자주 붙는 추가금", `${A.label} 중간값`, fees, false) +
+      acc("m:cases", "실제 추가금 사례", "후기", cases, false) + acc("m:cmp", "우리 계획과 설문 평균 비교", "단위: 만원", cmp, false) +
+      acc("m:support", "지자체 지원", "2026", support, false) + acc("m:srcs", "출처", "", srcs, false), { right: `${M.collected} 수집` });
   }
 
-  function render() {
-    $("exampleBar").hidden = !S.example;
-    $("area").value = AREA();
-    renderMarket();
-    renderHero(); renderStats(); renderNext(); renderPhases(); renderBudget(); renderGuests(); renderVendors();
+  // ---- 탭별 화면 ----
+  function panelHtml(tab) {
+    const sub = "글자를 누르면 고칠 수 있어요.";
+    if (tab === "tasks") return `<div class="two t2">${card("준비 체크리스트", modTasks("tab"), { right: `${S.tasks.filter((t) => t.done).length} / ${S.tasks.length}`, sub: "기한은 예식일에서 거꾸로 계산됩니다. " + sub })}
+      ${card("지금 챙길 일", modNext(8), { sub: "기한이 가까운 순서", cls: "sticky" })}</div>`;
+    if (tab === "budget") return card("예산", modBudget("tab"), { right: "단위: 만원", sub: "신혼집 보증금은 포함하지 않았습니다. " + sub }) + sumBar();
+    if (tab === "people") return `<div class="two t3">${card("하객", modGuests(), { right: "단위: 명", sub: "예상 인원과 참석 확정 인원을 구분해 적어 주세요." })}
+      ${card("업체", modVendors(), { right: `<span id="vendorCount">${S.vendors.length}곳</span>`, sub: "상담한 업체의 진행 상태를 눌러 바꾸세요. " + sub })}</div>`;
+    if (tab === "market") return modMarket();
+    return modStats() + `<div class="ov-grid"><div class="col">${card("지금 챙길 일", modNext(5), { sub: "체크하면 바로 완료 처리돼요." })}
+      ${card("준비 체크리스트", modTasks("ov"), { right: `${S.tasks.filter((t) => t.done).length} / ${S.tasks.length}` })}</div>
+      <div class="col">${card("예산", modBudget("ov"), { right: "단위: 만원" })}</div>
+      <div class="col">${card("하객", modGuests(), { right: "단위: 명" })}${card("업체", modVendors(), { right: `<span id="vendorCount">${S.vendors.length}곳</span>` })}</div></div>`;
   }
-  const touch = () => { save(); render(); };
+
+  function renderHeader() {
+    const act = document.activeElement;
+    if (act !== $("nameA")) $("nameA").value = S.a || "";
+    if (act !== $("nameB")) $("nameB").value = S.b || "";
+    if (act !== $("weddingDate")) $("weddingDate").value = S.date || "";
+    fitNames();
+    document.title = `${S.a || "우리"}와 ${S.b || "우리"}의 결혼준비`;
+    const w = parseDate(S.date);
+    if (!w) { $("ddayNum").textContent = "D-?"; $("ddaySub").textContent = "예식일을 정해 주세요"; $("dateLabel").textContent = ""; }
+    else {
+      const n = daysUntil(w);
+      $("ddayNum").textContent = n > 0 ? `D-${n}` : n === 0 ? "D-Day" : `D+${-n}`;
+      $("ddaySub").textContent = n > 0 ? `${Math.floor(n / 7)}주 ${n % 7}일 남았어요` : n === 0 ? "오늘이 예식일이에요" : "결혼을 축하드려요";
+      $("dateLabel").textContent = `${w.getFullYear()}년 ${w.getMonth() + 1}월 ${w.getDate()}일 (${DOW[w.getDay()]})`;
+    }
+    const done = S.tasks.filter((t) => t.done).length, p = pct(done, S.tasks.length);
+    $("ringPct").textContent = p + "%";
+    $("ringArc").style.strokeDashoffset = 263.9 * (1 - p / 100);
+  }
+  function renderTabs() {
+    const late = overdueCount();
+    $("tabs").innerHTML = TABS.map(([id, label]) => `<button type="button" class="tab" data-tab="${id}" ${UI.tab === id ? 'aria-current="page"' : ""}>${ICON[id]}<span>${label}</span>${id === "tasks" && late ? `<span class="bdg num" title="기한이 지난 일">${late}</span>` : ""}</button>`).join("");
+  }
+  function focusKey(el) {
+    if (!el || el === document.body) return null;
+    if (el.id) return "#" + el.id;
+    for (const a of ["data-bplan", "data-bspent", "data-task", "data-ed-input"]) if (el.hasAttribute && el.hasAttribute(a)) return `[${a}="${el.getAttribute(a)}"]`;
+    const f = el.closest && el.closest("form[data-addtask]");
+    return f ? `form[data-addtask="${f.dataset.addtask}"] input` : null;
+  }
+  let renderTimer = null;
+  function render() {
+    const a = document.activeElement, inPanel = a && $("panel").contains(a);
+    // 입력칸에 글자를 치는 중이면 화면을 다시 그리지 않고 잠시 뒤에 다시 시도한다 (상대방이 고친 내용이 도착해도 입력이 끊기지 않게)
+    if (inPanel && a.tagName === "INPUT" && a.dataset.dirty === "1") { clearTimeout(renderTimer); renderTimer = setTimeout(render, 600); return; }
+    const key = inPanel ? focusKey(a) : null;
+    $("exampleBar").hidden = !S.example;
+    renderHeader(); renderTabs();
+    $("panel").innerHTML = panelHtml(UI.tab);
+    if (key) { const el = document.querySelector(key); if (el) el.focus({ preventScroll: true }); }
+  }
+  const touch = () => { save(); clearTimeout(renderTimer); renderTimer = setTimeout(render, 0); };   // Tab 키로 다음 칸에 넘어간 뒤 그려서 포커스를 유지한다
+  function setTab(id) {
+    UI.tab = id; saveUI();
+    try { history.replaceState(null, "", "#" + id); } catch (e) {}
+    render(); window.scrollTo(0, 0);
+  }
+
+  // ---- 삭제와 되돌리기 ----
+  let toastTimer = null;
+  function toast(msg, undo) {
+    $("toastMsg").textContent = msg; $("toastUndo").hidden = !undo; $("toast").hidden = false;
+    $("toastUndo").onclick = () => { if (undo) undo(); $("toast").hidden = true; };
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { $("toast").hidden = true; }, 7000);
+  }
+  function del(kind, id) {
+    const list = { task: S.tasks, budget: S.budget, vendor: S.vendors }[kind], it = list.find((x) => x.id === id);
+    if (!it) return;
+    const snap = JSON.parse(JSON.stringify(S)), label = it.t || it.name;
+    if (kind === "task") S.tasks = S.tasks.filter((x) => x.id !== id);
+    else if (kind === "budget") S.budget = S.budget.filter((x) => x.id !== id);
+    else S.vendors = S.vendors.filter((x) => x.id !== id);
+    touch(); toast(`"${label}" 삭제했어요`, () => { S = snap; touch(); });
+  }
+
+  // ---- 글자 고치기 (글자를 누르면 입력칸으로 바뀜) ----
+  function startEdit(el) {
+    if (el.querySelector("input")) return;
+    const [kind, id, field] = el.dataset.ed.split(":"), list = { task: S.tasks, budget: S.budget, vendor: S.vendors }[kind], it = list.find((x) => x.id === id);
+    if (!it) return;
+    const cur = it[field] || "", inp = document.createElement("input");
+    inp.className = "ed-input"; inp.value = cur; inp.maxLength = 60; inp.setAttribute("aria-label", "내용 고치기"); inp.setAttribute("enterkeyhint", "done");
+    el.replaceChildren(inp); inp.focus(); inp.select();
+    let done = false;
+    const finish = (ok) => {
+      if (done) return; done = true;
+      const v = inp.value.trim();
+      inp.dataset.dirty = "";
+      if (ok && (v !== cur) && (v || field === "cat")) { it[field] = v; touch(); } else render();
+    };
+    inp.addEventListener("blur", () => finish(true));
+    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); finish(true); } else if (e.key === "Escape") { e.preventDefault(); finish(false); } });
+  }
 
   // ---- 이벤트 ----
   const fitNames = () => ["nameA", "nameB"].forEach((id) => { $(id).size = Math.max(3, $(id).value.length + 1); });
@@ -799,43 +881,43 @@
   $("nameB").addEventListener("change", () => render());
   $("weddingDate").addEventListener("change", (e) => { if (e.target.value) { S.date = e.target.value; touch(); } });
 
+  document.addEventListener("input", (e) => { const t = e.target; if (t.tagName === "INPUT" && t.type !== "checkbox" && $("panel").contains(t)) t.dataset.dirty = "1"; });
   document.addEventListener("change", (e) => {
-    const t = e.target;
-    if (t.dataset.task) { S.tasks.find((x) => x.id === t.dataset.task).done = t.checked; touch(); }
-    else if (t.dataset.bplan) { S.budget.find((x) => x.id === t.dataset.bplan).plan = num(t.value); touch(); }
-    else if (t.dataset.bspent) { S.budget.find((x) => x.id === t.dataset.bspent).spent = num(t.value); touch(); }
-    else if (t.dataset.vst) { S.vendors.find((x) => x.id === t.dataset.vst).st = t.value; touch(); }
-    else if (["gAe", "gAc", "gBe", "gBc", "unitCost"].includes(t.id)) {
-      const k = { gAe: "ae", gAc: "ac", gBe: "be", gBc: "bc", unitCost: "unit" }[t.id];
-      S.guests[k] = num(t.value); touch();
-    }
+    const t = e.target, find = (list, id) => list.find((x) => x.id === id);
+    t.dataset.dirty = "";
+    if (t.dataset.task) { find(S.tasks, t.dataset.task).done = t.checked; touch(); }
+    else if (t.dataset.bplan) { find(S.budget, t.dataset.bplan).plan = num(t.value); touch(); }
+    else if (t.dataset.bspent) { find(S.budget, t.dataset.bspent).spent = num(t.value); touch(); }
+    else if (["gAe", "gAc", "gBe", "gBc", "unitCost"].includes(t.id)) { S.guests[{ gAe: "ae", gAc: "ac", gBe: "be", gBc: "bc", unitCost: "unit" }[t.id]] = num(t.value); touch(); }
+    else if (t.id === "area") { S.area = t.value; touch(); }
   });
 
   document.addEventListener("click", (e) => {
-    const b = e.target.closest("button");
-    if (!b) return;
-    if (b.dataset.deltask) S.tasks = S.tasks.filter((x) => x.id !== b.dataset.deltask);
-    else if (b.dataset.delbudget) S.budget = S.budget.filter((x) => x.id !== b.dataset.delbudget);
-    else if (b.dataset.delvendor) S.vendors = S.vendors.filter((x) => x.id !== b.dataset.delvendor);
-    else return;
-    touch();
+    const t = e.target; let el;
+    if ((el = t.closest("[data-ed]"))) { startEdit(el); return; }
+    if ((el = t.closest("[data-tab]"))) { setTab(el.dataset.tab); return; }
+    if ((el = t.closest("[data-go]"))) { setTab(el.dataset.go); return; }
+    if ((el = t.closest("[data-open]"))) { const k = el.dataset.open; UI.open[k] = !isOpen(k, el.dataset.def === "1"); saveUI(); render(); return; }
+    if ((el = t.closest("[data-filter]"))) { UI.filter = el.dataset.filter; saveUI(); render(); return; }
+    if ((el = t.closest("[data-vset]"))) { const [id, st] = el.dataset.vset.split(":"); S.vendors.find((v) => v.id === id).st = st; touch(); return; }
+    if ((el = t.closest("[data-del]"))) { const [kind, id] = el.dataset.del.split(":"); del(kind, id); return; }
+    if (t.closest("#fillMarket")) {
+      S.budget.forEach((b) => { const r = refFor(b.name); if (r && r.mid != null) b.plan = r.mid; });
+      if (M) S.guests.unit = M.areas[AREA()].perGuest;
+      touch(); return;
+    }
   });
-
+  document.addEventListener("keydown", (e) => {
+    const el = e.target.closest && e.target.closest("[data-ed]");
+    if (el && (e.key === "Enter" || e.key === " ") && !el.querySelector("input")) { e.preventDefault(); startEdit(el); }
+  });
   document.addEventListener("submit", (e) => {
     e.preventDefault();
     const f = e.target;
-    if (f.dataset.addtask) {
-      const i = f.querySelector("input"), v = i.value.trim();
-      if (v) { S.tasks.push(task(f.dataset.addtask, v)); touch(); }
-    } else if (f.id === "budgetAdd") {
-      const v = $("budgetName").value.trim();
-      if (v) { S.budget.push(item($("budgetGroup").value, v, 0, 0)); $("budgetName").value = ""; touch(); }
-    } else if (f.id === "vendorAdd") {
-      const v = $("vName").value.trim();
-      if (v) { S.vendors.push(vendor(v, $("vCat").value.trim(), "todo")); $("vName").value = ""; $("vCat").value = ""; touch(); }
-    }
+    if (f.dataset.addtask) { const v = f.querySelector("input").value.trim(); if (v) { S.tasks.push(task(f.dataset.addtask, v)); touch(); } }
+    else if (f.id === "budgetAdd") { const v = $("budgetName").value.trim(); if (v) { S.budget.push(item($("budgetGroup").value, v, 0, 0)); touch(); } }
+    else if (f.id === "vendorAdd") { const v = $("vName").value.trim(); if (v) { S.vendors.push(vendor(v, $("vCat").value.trim(), "todo")); touch(); } }
   });
-
   $("clearExample").addEventListener("click", () => {
     S.example = false;
     S.tasks.forEach((t) => (t.done = false));
@@ -844,15 +926,8 @@
     S.vendors = [];
     touch();
   });
-  $("resetAll").addEventListener("click", () => { S = example(); touch(); });
-
-  if (M) $("area").innerHTML = Object.entries(M.areas).map(([k, a]) => `<option value="${k}">${a.label}</option>`).join("");
-  $("area").addEventListener("change", (e) => { S.area = e.target.value; touch(); });
-  $("fillMarket").addEventListener("click", () => {
-    S.budget.forEach((b) => { const r = refFor(b.name); if (r && r.mid != null) b.plan = r.mid; });
-    if (M) S.guests.unit = M.areas[AREA()].perGuest;
-    touch();
-  });
+  $("resetAll").addEventListener("click", () => { const snap = JSON.parse(JSON.stringify(S)); S = example(); touch(); toast("예시 상태로 되돌렸어요", () => { S = snap; touch(); }); });
+  window.addEventListener("hashchange", () => { const h = hashTab(); if (h && h !== UI.tab) { UI.tab = h; saveUI(); render(); } });
 
   // ---- Firebase(Firestore) 실시간 동기화 ----
   // 구조: weddings/{방코드}/meta/main, weddings/{방코드}/{tasks|budget|vendors}/{id}
@@ -1074,9 +1149,8 @@
   setStatus();
   if (SY.room) fbStart().catch((e) => fbError(e));
 
-  $("budgetGroup").innerHTML = GROUPS.map((g) => `<option>${g}</option>`).join("");
-  $("budgetGroup").value = "기타";
   render();
+  if (!location.hash) { try { history.replaceState(null, "", "#" + UI.tab); } catch (e) {} }
 })();
 </script>
 </body>
