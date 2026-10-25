@@ -2,7 +2,7 @@
 
 사용법:
   python3 tools/set_default_firebase.py WED1.xxxxx     # 연결 코드를 기본으로 설정
-  python3 tools/set_default_firebase.py --clear        # 기본 연결을 제거 (각자 연결)
+  python3 tools/set_default_firebase.py --clear        # 연결 코드를 제거 (각자 초대 링크로 연결). Firebase 설정값(config)은 그대로 둔다
 
 연결 코드는 대시보드의 연결 설정 창에서 "연결 코드로 보내기"로 복사할 수 있다.
 
@@ -31,15 +31,18 @@ def main():
     if len(sys.argv) != 2:
         sys.exit(__doc__)
     arg = sys.argv[1]
+    html = HTML.read_text(encoding="utf-8")
+    m = PAT.search(html)
+    if not m:
+        sys.exit("index.html 에 firebase-default 스크립트 태그가 없습니다.")
+    cur = json.loads(m.group(2) or "{}")          # config 는 그대로 두고 code 만 바꾼다
     if arg == "--clear":
-        data = "{}"
+        cur.pop("code", None)
     elif valid(arg):
-        data = json.dumps({"code": arg.strip()}, ensure_ascii=False)
+        cur["code"] = arg.strip()
     else:
         sys.exit("연결 코드가 올바르지 않습니다. WED1. 로 시작하는 코드를 통째로 넣어 주세요.")
-    html = HTML.read_text(encoding="utf-8")
-    if not PAT.search(html):
-        sys.exit("index.html 에 firebase-default 스크립트 태그가 없습니다.")
+    data = json.dumps(cur, ensure_ascii=False)
     HTML.write_text(PAT.sub(lambda m: m.group(1) + data + m.group(3), html, count=1), encoding="utf-8")
     print("기본 연결을 제거했습니다." if arg == "--clear" else "기본 연결을 설정했습니다. 공개 주소로 올리지 마세요.")
 

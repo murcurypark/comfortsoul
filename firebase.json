@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": ["firebase.json", ".firebaserc", ".nojekyll", "**/.*", "**/node_modules/**", "README.md", "tools/**"],
+    "headers": [
+      { "source": "**/*.html", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
+      { "source": "/", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+    ]
+  }
+}

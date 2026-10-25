@@ -60,6 +60,26 @@ python3 tools/set_default_firebase.py --clear        # 제거
 
 실제 Firebase SDK와 Firestore 에뮬레이터(보안 규칙 포함)로 검증했습니다. 에뮬레이터는 Java가 필요합니다.
 
+## 배포 (Firebase Hosting)
+
+`firebase.json`과 `.firebaserc`가 들어 있어서 같은 Firebase 프로젝트(`jisu-seongsu-wedding`)에 바로 올릴 수 있습니다. 올라가는 파일은 `index.html` 하나입니다.
+주소는 `https://jisu-seongsu-wedding.web.app` 입니다. 레포가 비공개여도 상관없고, 무료 요금제 안에서 충분합니다.
+
+1. Firebase 콘솔 → **빌드 → Hosting → 시작하기**를 한 번 눌러 둡니다 (안내 화면은 끝까지 눌러 넘기면 됩니다).
+2. 내 컴퓨터에서 (Node.js 필요) 레포 폴더로 들어가 아래를 실행합니다.
+   ```
+   npm install -g firebase-tools
+   firebase login
+   firebase deploy --only hosting
+   ```
+3. 앞으로 고칠 때마다 `firebase deploy --only hosting`만 다시 실행하면 됩니다.
+
+푸시할 때마다 자동으로 올리려면 레포 폴더에서 `firebase init hosting:github`을 한 번 실행하세요. GitHub 연결과 배포용 비밀값 등록, 워크플로 파일 생성을 안내에 따라 해 줍니다. 비공개 레포에서도 동작합니다.
+
+- 배포된 페이지는 **주소를 아는 누구나 열 수 있습니다.** 레포를 비공개로 해도 배포된 페이지의 소스는 공개됩니다. 그래서 방 코드가 든 연결 코드를 페이지에 넣지 말고(`tools/set_default_firebase.py`는 비공개 호스팅용), 초대 링크로 연결하세요.
+- 선택: Google Cloud 콘솔 → API 및 서비스 → 사용자 인증 정보에서 이 프로젝트의 브라우저 키에 **HTTP 리퍼러 제한**으로 `jisu-seongsu-wedding.web.app/*`를 걸면, 다른 사이트에서 이 키를 쓰는 것을 막을 수 있습니다. (파일로 열어 쓰는 경우에는 걸지 마세요.)
+- GitHub Pages는 무료 플랜에서 비공개 레포로는 쓸 수 없으므로, 레포를 비공개로 바꾸면 Pages 주소는 닫힙니다.
+
 ## 시세 데이터 갱신
 
 예산 옆의 참고 시세와 "시세 참고" 카드는 `wedding_data` SQLite DB에서 뽑은 집계값입니다.
