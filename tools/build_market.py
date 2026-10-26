@@ -1,6 +1,6 @@
 """wedding_data DB에서 시세 참고용 집계값만 뽑아 index.html에 넣는다.
 
-사용법: python3 tools/build_market.py path/to/wedding_data_clean.db
+사용법: python3 tools/build_market.py path/to/wedding_data_clean.db [path/to/wedding_cafe.db]
 
 index.html 의 <script id="market-data" type="application/json"> ... </script> 내용을 교체한다.
 업체 연락처, 후기 작성자 등 원본 행 데이터는 넣지 않는다.
@@ -109,10 +109,58 @@ def build(db):
             "cost": cost, "extra": extra, "support": support, "scenarios": scen, "sources": sources, "collected": collected}
 
 
+CAFE_REGIONS = {
+    "seoul": "서울|강남|잠실|종로",
+    "gyeongin": "경기|인천|수원|성남|일산|분당|부천|안양|안산|용인|평택|화성|의정부|고양|파주|김포|시흥|남양주|하남|광명|구리",
+    "metro": "부산|대구|대전|광주|울산",
+}
+
+
+def pct(vals, p):
+    v = sorted(vals)
+    i = (len(v) - 1) * p
+    f = int(i)
+    return v[f] + (v[min(f + 1, len(v) - 1)] - v[f]) * (i - f)
+
+
+def build_cafe(db):
+    """박람회 후기 카페 글에서 스드메 계약 총액 분포와 추가금·할인 평균만 집계한다. 업체명은 포함하지만 글 본문과 작성자는 넣지 않는다."""
+    c = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    rs = c.execute("select a.title, s.total_won from articles a join article_summary s using(article_id) "
+                   "where s.total_won between 1000000 and 5000000 and a.title like '%드메%'").fetchall()
+    groups = {"all": []}
+    for title, won in rs:
+        groups["all"].append(won)
+        k = next((k for k, pat in CAFE_REGIONS.items() if re.search(pat, title)), "other")
+        groups.setdefault(k, []).append(won)
+    total = {k: {"n": len(v), "q1": round(pct(v, .25) / 1e4), "med": round(pct(v, .5) / 1e4), "q3": round(pct(v, .75) / 1e4)} for k, v in groups.items()}
+    kinds = {k: [n, round(a / 1e4, 1)] for k, n, a in c.execute(
+        "select kind, count(*), avg(amount_won) from price_mentions where kind in ('extra','discount') group by kind")}
+    # 업체별: 언급된 후기 수, 그 후기들의 스드메 계약 총액 평균, 후기에 금액이 적힌 개별 항목 가격
+    items = {(r[0], r[1]): r for r in c.execute("select category, vendor_name, with_amount, avg_amount_won, min_amount_won, max_amount_won from vendor_item_stats")}
+    vendors = []
+    for vid, name, cat, n, linked, avg, lo, hi in c.execute(
+            "select vendor_id, vendor_name, category, posts_mentioning, linked_articles, avg_post_total_won, min_post_total_won, max_post_total_won from vendor_stats order by posts_mentioning desc, vendor_name"):
+        v = {"name": name, "cat": cat, "n": n}
+        if avg and linked and linked >= 3:
+            v["total"] = [linked, round(avg / 1e4), round(lo / 1e4), round(hi / 1e4)]
+        it = items.get((cat, name))
+        if it and it[2] and it[2] >= 2 and it[3]:
+            v["item"] = [it[2], round(it[3] / 1e4), round(it[4] / 1e4), round(it[5] / 1e4)]
+        vendors.append(v)
+    dep = c.execute("select count(*), avg(amount_won) from price_mentions where kind='deposit'").fetchone()
+    first, last = c.execute("select min(written_at), max(written_at) from articles").fetchone()
+    return {"total": total, "extra": kinds.get("extra"), "discount": kinds.get("discount"),
+            "vendors": vendors, "deposit": [dep[0], round(dep[1] / 1e4, 1)], "posts": c.execute("select count(*) from articles").fetchone()[0], "from": first[:7].replace(".", "-"), "to": last[:7].replace(".", "-")}
+
+
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) not in (2, 3):
         sys.exit(__doc__)
-    data = json.dumps(build(sys.argv[1]), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    market = build(sys.argv[1])
+    if len(sys.argv) == 3:
+        market["cafe"] = build_cafe(sys.argv[2])
+    data = json.dumps(market, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     html = HTML.read_text(encoding="utf-8")
     pat = re.compile(r'(<script id="market-data" type="application/json">)(.*?)(</script>)', re.S)
     if not pat.search(html):
