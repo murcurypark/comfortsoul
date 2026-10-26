@@ -124,7 +124,7 @@ def pct(vals, p):
 
 
 def build_cafe(db):
-    """박람회 후기 카페 글에서 스드메 계약 총액 분포와 추가금·할인 평균만 집계한다. 글 본문, 작성자, 업체명은 넣지 않는다."""
+    """박람회 후기 카페 글에서 스드메 계약 총액 분포와 추가금·할인 평균만 집계한다. 업체명은 포함하지만 글 본문과 작성자는 넣지 않는다."""
     c = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
     rs = c.execute("select a.title, s.total_won from articles a join article_summary s using(article_id) "
                    "where s.total_won between 1000000 and 5000000 and a.title like '%드메%'").fetchall()
@@ -136,9 +136,22 @@ def build_cafe(db):
     total = {k: {"n": len(v), "q1": round(pct(v, .25) / 1e4), "med": round(pct(v, .5) / 1e4), "q3": round(pct(v, .75) / 1e4)} for k, v in groups.items()}
     kinds = {k: [n, round(a / 1e4, 1)] for k, n, a in c.execute(
         "select kind, count(*), avg(amount_won) from price_mentions where kind in ('extra','discount') group by kind")}
+    # 업체별: 언급된 후기 수, 그 후기들의 스드메 계약 총액 평균, 후기에 금액이 적힌 개별 항목 가격
+    items = {(r[0], r[1]): r for r in c.execute("select category, vendor_name, with_amount, avg_amount_won, min_amount_won, max_amount_won from vendor_item_stats")}
+    vendors = []
+    for vid, name, cat, n, linked, avg, lo, hi in c.execute(
+            "select vendor_id, vendor_name, category, posts_mentioning, linked_articles, avg_post_total_won, min_post_total_won, max_post_total_won from vendor_stats order by posts_mentioning desc, vendor_name"):
+        v = {"name": name, "cat": cat, "n": n}
+        if avg and linked and linked >= 3:
+            v["total"] = [linked, round(avg / 1e4), round(lo / 1e4), round(hi / 1e4)]
+        it = items.get((cat, name))
+        if it and it[2] and it[2] >= 2 and it[3]:
+            v["item"] = [it[2], round(it[3] / 1e4), round(it[4] / 1e4), round(it[5] / 1e4)]
+        vendors.append(v)
+    dep = c.execute("select count(*), avg(amount_won) from price_mentions where kind='deposit'").fetchone()
     first, last = c.execute("select min(written_at), max(written_at) from articles").fetchone()
     return {"total": total, "extra": kinds.get("extra"), "discount": kinds.get("discount"),
-            "posts": c.execute("select count(*) from articles").fetchone()[0], "from": first[:7].replace(".", "-"), "to": last[:7].replace(".", "-")}
+            "vendors": vendors, "deposit": [dep[0], round(dep[1] / 1e4, 1)], "posts": c.execute("select count(*) from articles").fetchone()[0], "from": first[:7].replace(".", "-"), "to": last[:7].replace(".", "-")}
 
 
 def main():
