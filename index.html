@@ -292,6 +292,13 @@
   dialog .join { display: flex; gap: 8px; }
   dialog input[type=text] { flex: 1; min-width: 0; min-height: 48px; border: 1.5px solid var(--line); background: var(--surface); border-radius: 10px; padding: 0 14px; color: var(--ink); font: 600 16px ui-monospace, Menlo, monospace; letter-spacing: .03em; }
   dialog input[type=text]:focus { outline: none; border-color: var(--accent); }
+  dialog form.mail { display: grid; gap: 6px; margin-top: 12px; }
+  dialog form.mail label { font-size: 14px; font-weight: 700; color: var(--ink-2); }
+  dialog input[type=email], dialog input[type=password] { min-height: 48px; width: 100%; box-sizing: border-box; border: 1.5px solid var(--line); background: var(--surface); border-radius: 10px; padding: 0 14px; color: var(--ink); font-size: 16px; font-family: inherit; }
+  dialog input[type=email]:focus, dialog input[type=password]:focus { outline: none; border-color: var(--accent); }
+  dialog .or { display: flex; align-items: center; gap: 10px; margin-top: 14px; color: var(--ink-2); font-size: 14px; }
+  dialog .or::before, dialog .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  dialog .btn.link { background: none; border: 0; text-decoration: underline; min-height: 44px; padding: 0 4px; }
   dialog .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
   dialog .msg { margin-top: 12px; font-size: 15px; min-height: 1.4em; }
   dialog .msg.bad { color: var(--bad); } dialog .msg.ok { color: var(--ok); }
@@ -379,7 +386,7 @@
       <button type="button" id="clearExample">예시 지우고 시작</button>
     </div>
     <div class="bar-note info" id="linkBar" hidden>
-      <span>지금은 이 기기에만 저장돼요. 구글 계정으로 로그인하면 내 저장소에 안전하게 저장되고, 커플 코드로 두 분이 같은 저장소를 함께 쓸 수 있어요.</span>
+      <span>지금은 이 기기에만 저장돼요. 로그인하면 내 저장소에 안전하게 저장되고, 커플 코드로 두 분이 같은 저장소를 함께 쓸 수 있어요.</span>
       <div><button type="button" id="linkNow">로그인</button><button type="button" id="linkLater">나중에</button></div>
     </div>
     <div class="bar-note bad" id="syncBar" hidden>
@@ -399,8 +406,15 @@
 <dialog id="syncDialog" aria-labelledby="syncTitle">
   <h2 id="syncTitle">로그인하고 저장하기</h2>
   <div id="syncOff">
-    <p>구글 계정으로 로그인하면 <b>내 계정 전용 저장소</b>에 저장돼요. 다른 사람은 볼 수 없어요. 커플은 로그인한 뒤 <b>커플 코드</b>로 같은 저장소를 함께 쓸 수 있어요.</p>
-    <div class="row"><button class="btn pri" type="button" id="googleIn">Google로 로그인</button></div>
+    <p>로그인하면 <b>내 계정 전용 저장소</b>에 저장돼요. 다른 사람은 볼 수 없어요. 커플은 로그인한 뒤 <b>커플 코드</b>로 같은 저장소를 함께 쓸 수 있어요.</p>
+    <form id="mailForm" class="mail" novalidate>
+      <label for="mailIn">이메일</label><input id="mailIn" type="email" autocomplete="username" inputmode="email" placeholder="name@example.com">
+      <label for="pwIn">비밀번호 (6자 이상)</label><input id="pwIn" type="password" autocomplete="current-password" placeholder="비밀번호">
+      <div class="row"><button class="btn pri" type="submit" id="mailSignIn">이메일로 로그인</button><button class="btn" type="button" id="mailSignUp">처음이면 가입하기</button></div>
+      <div class="row"><button class="btn link" type="button" id="mailReset">비밀번호를 잊었어요</button></div>
+    </form>
+    <div class="or"><span>또는</span></div>
+    <div class="row"><button class="btn" type="button" id="googleIn">Google로 로그인 (선택)</button></div>
   </div>
   <div id="syncOn" hidden>
     <p><b id="whoami"></b> 계정으로 로그인했어요. 인터넷이 끊겨도 입력할 수 있고, 연결되면 자동으로 저장돼요.</p>
@@ -424,7 +438,7 @@
   <details id="stepSetup">
     <summary>처음 설정하는 사람 (관리하는 한 분이 한 번만)</summary>
     <ol>
-      <li><a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase 콘솔</a> → <b>빌드 → Authentication → 시작하기 → 로그인 방법(Sign-in method) → Google</b>을 <b>사용 설정</b>하고, 프로젝트 지원 이메일을 고른 뒤 저장합니다.</li>
+      <li><a href="https://console.firebase.google.com/" target="_blank" rel="noopener">Firebase 콘솔</a> → <b>빌드 → Authentication → 시작하기 → 로그인 방법(Sign-in method)</b>에서 <b>이메일/비밀번호</b>를 사용 설정합니다. 구글 로그인도 쓰려면 <b>Google</b>도 사용 설정하고 프로젝트 지원 이메일을 고른 뒤 저장합니다.</li>
       <li>아래 규칙을 복사해 <b>Firestore Database → 규칙</b> 탭의 기존 내용을 모두 지우고 붙여 넣은 뒤 <b>게시</b>합니다.</li>
     </ol>
     <textarea id="fbRulesText" readonly spellcheck="false"></textarea>
@@ -1129,7 +1143,6 @@ service cloud.firestore {
     try {
       const [appMod, authMod, fs] = await Promise.all([import(FB_BASE + "firebase-app.js"), import(FB_BASE + "firebase-auth.js"), import(FB_BASE + "firebase-firestore.js")]);
       const cfg = { ...DEFAULT_CFG };
-      if (/\.(web\.app|firebaseapp\.com)$/.test(location.hostname)) cfg.authDomain = location.host;   // 같은 주소에서 로그인 처리 (브라우저의 제3자 저장소 제한 회피)
       const app = appMod.initializeApp(cfg, "wedding"), auth = authMod.getAuth(app);
       FB = { appMod, authMod, fs, app, auth, db: null, unsubs: [], userUnsub: null };
       authMod.onAuthStateChanged(auth, onUser, (e) => { authReady = true; fbError(e); });
@@ -1202,7 +1215,15 @@ service cloud.firestore {
     const c = (e && e.code) || "";
     return ({
       "auth/unauthorized-domain": `이 주소(${location.hostname})가 로그인에 허용되지 않았어요. Firebase 콘솔 → Authentication → 설정 → 승인된 도메인에 추가해 주세요.`,
-      "auth/operation-not-allowed": "Google 로그인이 꺼져 있어요. Firebase 콘솔 → Authentication → 로그인 방법에서 Google을 사용 설정해 주세요.",
+      "auth/operation-not-allowed": "이 로그인 방법이 꺼져 있어요. Firebase 콘솔 → Authentication → 로그인 방법에서 사용 설정해 주세요.",
+      "auth/invalid-email": "이메일 형식이 올바르지 않아요.",
+      "auth/missing-password": "비밀번호를 입력해 주세요.",
+      "auth/weak-password": "비밀번호는 6자 이상으로 해 주세요.",
+      "auth/email-already-in-use": "이미 가입된 이메일이에요. '이메일로 로그인'을 눌러 주세요.",
+      "auth/invalid-credential": "이메일이나 비밀번호가 맞지 않아요. 처음이면 '가입하기'를 눌러 주세요.",
+      "auth/user-not-found": "가입된 이메일이 아니에요. '가입하기'를 눌러 주세요.",
+      "auth/wrong-password": "비밀번호가 맞지 않아요.",
+      "auth/too-many-requests": "시도가 너무 많아요. 잠시 뒤에 다시 해 주세요.",
       "auth/operation-not-supported-in-this-environment": "파일로 열면 로그인할 수 없어요. 웹 주소로 열어 주세요.",
       "auth/network-request-failed": "인터넷 연결을 확인해 주세요.",
       "auth/internal-error": "로그인 창을 열지 못했어요. 팝업이나 광고 차단 설정을 확인하고 다시 눌러 주세요.",
@@ -1224,6 +1245,21 @@ service cloud.firestore {
     }
   }
 
+  // 이메일·비밀번호 로그인 (구글 없이도 쓸 수 있다)
+  async function mailAuth(kind) {
+    if (!FB) await authInit();
+    if (!FB) { dmsg("로그인 기능을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.", "bad"); return; }
+    const mail = $("mailIn").value.trim(), pw = $("pwIn").value, { authMod, auth } = FB;
+    if (!mail) { dmsg("이메일을 입력해 주세요.", "bad"); return; }
+    try {
+      if (kind === "reset") { await authMod.sendPasswordResetEmail(auth, mail); dmsg("비밀번호를 바꾸는 메일을 보냈어요. 메일함(스팸함 포함)을 확인해 주세요.", "ok"); return; }
+      if (!pw) { dmsg("비밀번호를 입력해 주세요.", "bad"); return; }
+      dmsg(kind === "up" ? "가입하는 중…" : "로그인하는 중…");
+      await (kind === "up" ? authMod.createUserWithEmailAndPassword : authMod.signInWithEmailAndPassword)(auth, mail, pw);
+      $("pwIn").value = ""; dmsg(""); dlg.close();
+    } catch (e) { dmsg(authExplain(e), "bad"); }
+  }
+
   // ---- 설정 창 ----
   const dlg = $("syncDialog"), dmsg = (t, c) => { const m = $("syncDlgMsg"); m.textContent = t; m.className = "msg " + (c || ""); };
   $("fbRulesText").value = RULES;
@@ -1240,6 +1276,9 @@ service cloud.firestore {
   });
   dlg.addEventListener("click", (e) => { if (e.target === dlg || e.target.closest("[data-close]")) dlg.close(); });
   $("googleIn").addEventListener("click", signIn);
+  $("mailForm").addEventListener("submit", (e) => { e.preventDefault(); mailAuth("in"); });
+  $("mailSignUp").addEventListener("click", () => mailAuth("up"));
+  $("mailReset").addEventListener("click", () => mailAuth("reset"));
   $("signOutBtn").addEventListener("click", async () => { try { await FB.authMod.signOut(FB.auth); } catch (e) {} dlg.close(); });
   const copyFrom = (btn, id, msg) => btn.addEventListener("click", async () => { const el = $(id); try { await navigator.clipboard.writeText(el.value); dmsg(msg, "ok"); } catch (e) { el.select(); dmsg("선택했어요. 직접 복사해 주세요.", "ok"); } });
   copyFrom($("fbCopyRules"), "fbRulesText", "규칙을 복사했어요."); copyFrom($("coupleCopy"), "coupleCodeShow", "커플 코드를 복사했어요. 상대방에게 보내 주세요.");
